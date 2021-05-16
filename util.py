@@ -12,10 +12,9 @@ class Game:
         Implements predefined behaviour and supplies the children with method-prototypes, which will be slightly modified
         by the children.
 
-        :param title: The title of the pygame window
-        :type title: str
-        :param windowSize: The size of the pigame window
-        :type windowSize: (int, int)
+        Args:
+            title (str): The title of the pygame window
+            windowSize (tuple[int, int]): The size of the pygame window
         """
 
         self.title = title
@@ -48,8 +47,6 @@ class Game:
         """
         Main loop of the application.
         Calls methods self.updateEvents(), self.updateGameState() and self.updateScreen() while self.isRunning is true
-
-        :return: None
         """
 
         while self.isRunning:
@@ -67,8 +64,6 @@ class Game:
         """
         This functions gets every pygame event and handles quit and pause.
         Unhandled Events are passed down to self.handleEvent() to be handled by children classes.
-
-        :return: None
         """
 
         self.events = pygame.event.get()
@@ -89,9 +84,8 @@ class Game:
         """
         This method specifies game-specific behavior on pygame events
 
-        :param event: The to be handled event
-        :type event: pygame.event.Event
-        :return: None
+        Args:
+            event (pygame.event.Event): The to be handled event
         """
 
         # print("Unhandled event:", event)
@@ -100,8 +94,6 @@ class Game:
     def updateGameState(self):
         """
         This method handles all game-specific state changes. It is to be implemented by the children classes.
-
-        :return: None
         """
 
         pass
@@ -110,8 +102,6 @@ class Game:
         """
         This method updates the pygame window by drawing object.
         It also handles the pause behaviour.
-
-        :return: None
         """
 
         if self.isPaused:
@@ -121,11 +111,10 @@ class Game:
 
     def drawMenu(self, menu=None):
         """
-        This method draws a given menu to the screen
+        This method draws a given menu to the screen. Default menu is the pause menu
 
-        :param menu: The menu to draw
-        :type menu: pygame_menu.Menu
-        :return: None
+        Args:
+            menu (pygame_menu.Menu): The menu to draw
         """
 
         if not menu:
@@ -139,8 +128,6 @@ class Game:
     def togglePause(self):
         """
         This method toggles self.isPaused and is called once the user pressed the ESC-key
-
-        :return: None
         """
 
         self.isPaused = not self.isPaused
@@ -148,8 +135,6 @@ class Game:
     def quit(self):
         """
         This method is called once the player quits the game.
-
-        :return: None
         """
 
         self.isRunning = False
@@ -204,8 +189,6 @@ class GameContainer(Game):
     def startSnake():
         """
         This function starts the Snake-Game
-
-        :return: None
         """
 
         from games import Snake
@@ -215,8 +198,6 @@ class GameContainer(Game):
     def startTTT():
         """
         This function starts the TicTacToe-Game
-
-        :return: None
         """
 
         from games import TicTacToe
@@ -225,8 +206,6 @@ class GameContainer(Game):
     def quit(self):
         """
         This method quits the application.
-
-        :return: None
         """
 
         pygame.quit()
