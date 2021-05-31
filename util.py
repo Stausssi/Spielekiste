@@ -10,8 +10,8 @@ class Game:
         """
         Superclass for every component in this application.
 
-        Implements predefined behaviour and supplies the children with method-prototypes, which will be slightly modified
-        by the children.
+        Implements predefined behaviour and supplies the children with method-prototypes, which will be slightly
+        modified by the children.
 
         Args:
             title (str): The title of the pygame window
@@ -251,6 +251,7 @@ class GameContainer(Game):
 
         pygame.quit()
         exit(0)
+
 
 class Image(pygame.sprite.Sprite):
     def __init__(self, x, y, size, image, pathToImage="images/", colorkey=(0, 0, 0), hasColorkey=True):
