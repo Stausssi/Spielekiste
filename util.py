@@ -1,3 +1,4 @@
+import os
 import pygame
 import pygame_menu
 
@@ -250,3 +251,76 @@ class GameContainer(Game):
 
         pygame.quit()
         exit(0)
+
+class Image(pygame.sprite.Sprite):
+    def __init__(self, x, y, size, image, pathToImage="images/", colorkey=(0, 0, 0), hasColorkey=True):
+        """
+        This class represents a image in a game. This can be a texture, character, etc.
+        It's parent is pygame.sprite.Sprite
+
+        Args:
+            x (int): The position on the screen on the x-axis
+            y (int): The position on the screen on the y-axis
+            size (tuple[int, int]): The size of the image
+            image (str): The name of the image file to open
+            pathToImage (str): The name of the folder of the image
+            colorkey (tuple[int, int, int]): The color to be replaced with transparent pixels
+            hasColorkey (bool): Specifies whether the color given in colorkey will be replaced
+        """
+        super().__init__()
+
+        # Load the given image
+        self.image = pygame.transform.smoothscale(pygame.image.load(os.path.join(pathToImage, image)).convert(), size)
+
+        # Apply colorkey
+        if hasColorkey:
+            self.image.set_colorkey(colorkey)
+
+        # Create size variable and position the image on the screen
+        self.SIZE = pygame.Rect(0, 0, size[0], size[1])
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def getX(self) -> int:
+        """
+        This method returns the most left x value of the image
+
+        Returns: x-coordinate of the image
+        """
+
+        return self.rect.x
+
+    def setX(self, x) -> None:
+        """
+        This method moves the image to the given value on the x-axis
+
+        Args:
+            x (int): The x-coordinate to move the image to
+
+        Returns: None
+        """
+
+        self.rect.x = x
+
+    def getY(self) -> int:
+        """
+        This method returns the y-axis value of the image
+
+        Returns: y-coordinate of the image
+        """
+
+        return self.rect.y
+
+    def setY(self, y) -> None:
+        """
+        This method moves the image to the given value on the y-axis
+
+        Args:
+            y (int): The y-coordinate to move the image to
+
+        Returns: None
+        """
+
+        self.rect.y = y
