@@ -191,7 +191,7 @@ class GameContainer(Game):
         This function starts the Snake-Game
         """
 
-        from games import Snake
+        from games.Snake import Snake
         Snake()
 
     @staticmethod
@@ -200,7 +200,7 @@ class GameContainer(Game):
         This function starts the TicTacToe-Game
         """
 
-        from games import TicTacToe
+        from games.TicTacToe import TicTacToe
         TicTacToe()
 
     def quit(self):
