@@ -1,6 +1,13 @@
 # Spielekiste
 Game Container to support multiple arcade games 
 
+Spielekiste mit mehreren kleinen Spielen, beispielsweise Tic Tac Toe, Pong, Pac Man, Space Invader,
+Snake, Achtung die Kurve. Anzahl der Spiele erweiterbar um alles, was nicht von der Anzeige von
+privaten Informationen (beispielsweise Kartenhand bei Uno) abhängt. Gespielt werden kann sowohl
+gegen einen echten Menschen (lokal), oder gegen einen Computer. Der Computer wird entweder
+durch statische Programmierung oder mit Hilfe einer künstlichen Intelligenz implementiert.
+Spiele sollen über grafisches Hauptmenü auswählbar sein. 
+
 ## Contributors
 - Niklas Drössler
 - Simon Stauss
