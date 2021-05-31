@@ -21,12 +21,12 @@ Kernkriterien:
 Sitekriterien:
 - (10%) - Eigenleistung: geeignetes Logverfahren suchen und anwenden
 - (20%) - Codequalität und Stil
-- (20%) - Funktionalität (requirement Informationen --- welche Module, Frameworks, Versionen, OS ... )
+- (20%) - Funktionalität (requirement Informationen --- welche Module, Frameworks, Versionen, OS ...)
 
 weitere Kriterien:
 - wir wollen am Ende kein kundenfähiges System
-- Programm Intiutivität für den Nutzer möglichst einfach
-- Besondere Bemühungen und Aufwand, Elemente (Sound, Grafikdateien, Gameplay,... )
+- Programm Intuitivität für den Nutzer möglichst einfach
+- Besondere Bemühungen und Aufwand, Elemente (Sound, Grafikdateien, Gameplay, ...)
 - pi mal Daumen 48 Stunden zur Orientierung
 
 Bonuspunkte: -- Copy+Paste vs. Eigenaufwand

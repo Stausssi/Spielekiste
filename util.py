@@ -157,21 +157,43 @@ class GameContainer(Game):
             height=self.windowSize[1],
             theme=pygame_menu.themes.THEME_DARK  # title_close_button=False
         )
+        self.playMenu = pygame_menu.Menu(
+            title="Spiel wählen",
+            width=self.windowSize[0],
+            height=self.windowSize[1],
+            theme=pygame_menu.themes.THEME_DARK
+        )
         self.optionsMenu = pygame_menu.Menu(
             title="Optionen",
             width=self.windowSize[0],
             height=self.windowSize[1],
             theme=pygame_menu.themes.THEME_DARK
         )
+        self.highscoreMenu = pygame_menu.Menu(
+            title="Highscores",
+            width=self.windowSize[0],
+            height=self.windowSize[1],
+            theme=pygame_menu.themes.THEME_DARK
+        )
 
         # Add buttons to main menu
-        self.mainMenu.add.button("Play Snake", self.startSnake)
-        self.mainMenu.add.button("Play Tic Tac Toe", self.startTTT)
+        self.mainMenu.add.button("Play", self.playMenu)
         self.mainMenu.add.button("Options", self.optionsMenu)
+        self.mainMenu.add.button("Highscores", self.highscoreMenu)
         self.mainMenu.add.button("Quit", self.quit)
+
+        # Add games to play menu
+        self.playMenu.add.button("Play Snake", self.startSnake)
+        self.playMenu.add.button("Play Tic Tac Toe", self.startTTT)
+        self.playMenu.add.button("Play Pong", self.startPong)
+        self.playMenu.add.button("Play Space-Invader", self.startSpaceInvader)
+        self.playMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to options menu
         self.optionsMenu.add.button("Back", pygame_menu.events.BACK)
+
+        # Add buttons to highscore menu
+        self.highscoreMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Quit the game on esc
         self.pauseBehaviour = self.quit
@@ -202,6 +224,24 @@ class GameContainer(Game):
 
         from games.TicTacToe import TicTacToe
         TicTacToe()
+
+    @staticmethod
+    def startPong():
+        """
+        This functions starts the Pong-Game
+        """
+
+        from games.Pong import Pong
+        Pong()
+
+    @staticmethod
+    def startSpaceInvader():
+        """
+        This functions starts the Pong-Game
+        """
+
+        from games.SpaceInvader import SpaceInvader
+        SpaceInvader()
 
     def quit(self):
         """
