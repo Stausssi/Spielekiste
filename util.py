@@ -71,13 +71,18 @@ class Game:
 
         # Loop through every event
         for event in self.events:
+            eventHandled = False
+            
             if event.type == pygame.QUIT:
                 self.quit()
+                eventHandled = True
             if event.type == pygame.KEYDOWN:
                 # Toggle pause on ESC
                 if event.key == pygame.K_ESCAPE:
                     self.togglePause()
-            else:
+                    eventHandled = True
+
+            if not eventHandled:
                 # further event handling
                 self.handleEvent(event)
 
@@ -109,6 +114,28 @@ class Game:
             self.pauseBehaviour()
 
         pygame.display.update()
+
+    def drawImageOnSurface(self, image, position=None, surface=None):
+        """
+        This method draws a given image on a surface.
+
+        Args:
+            image (Image): The image to draw
+            position (pygame.rect.Rect): The position to draw the image at. Defaults to the position saved in the image
+             class
+            surface (pygame.surface.Surface): The surface to draw the image on. Defaults to the default surface of the
+             game
+
+        Returns: None
+        """
+
+        if position is None:
+            position = image.rect
+
+        if surface is None:
+            surface = self.surface
+
+        surface.blit(image.image, position)
 
     def drawMenu(self, menu=None):
         """
