@@ -1,12 +1,14 @@
 import pygame
 
-from util import Game
+from util import Game, Image
 
 
 class Player:
     def __init__(self, xpos, ypos):
         # image
-        
+
+        self.player_image = Image(50,50, ())
+
         # positions
         self.xpos = xpos
         self.ypos = ypos
