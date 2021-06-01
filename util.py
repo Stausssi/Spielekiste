@@ -130,7 +130,7 @@ class Game:
         if surface is None:
             surface = self.surface
 
-        surface.blit(image, position)
+        surface.blit(image.image, position)
 
     def drawMenu(self, menu=None):
         """
