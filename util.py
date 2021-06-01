@@ -110,6 +110,28 @@ class Game:
 
         pygame.display.update()
 
+    def drawImageOnSurface(self, image, position=None, surface=None):
+        """
+        This method draws a given image on a surface.
+
+        Args:
+            image (Image): The image to draw
+            position (pygame.rect.Rect): The position to draw the image at. Defaults to the position saved in the image
+             class
+            surface (pygame.surface.Surface): The surface to draw the image on. Defaults to the default surface of the
+             game
+
+        Returns: None
+        """
+
+        if position is None:
+            position = image.rect
+
+        if surface is None:
+            surface = self.surface
+
+        surface.blit(image, position)
+
     def drawMenu(self, menu=None):
         """
         This method draws a given menu to the screen. Default menu is the pause menu
