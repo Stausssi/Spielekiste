@@ -64,9 +64,6 @@ class Snake(Game):
         self.tickCounter += 1
 
     def updateSnakeTiles(self):
-        # Allow movement again
-        self.allowMove = True
-
         # Update the direction and position of every other element
         for index in range(len(self.snakeTiles) - 1, 0, -1):
             # Retrieve direction and position of the previous element
@@ -91,6 +88,33 @@ class Snake(Game):
             self.head.setY(self.head.getY() + Configuration.SNAKE_TILE_SIZE)
         elif self.currentDirection == Direction.LEFT:
             self.head.setX(self.head.getX() - Configuration.SNAKE_TILE_SIZE)
+
+        # Check whether a snake tile is at a corner and change the picture if so
+        for index in range(1, len(self.snakeTiles)):
+            prevDirection = self.snakeTiles[index - 1].getDirection()
+
+            tile = self.snakeTiles[index]
+            rotate = tile.getRotateTile(prevDirection)
+            if rotate != 0:
+                """
+                The angle depends on the direction switch
+                U -> R: 0       -1  -1
+                R -> D: 90      -1  -1
+                D -> L: 180     -1  -1
+                L -> U: 270      3  -1
+                
+                U -> L: Mirror          -3  1
+                L -> D: Mirror - 90      1  1
+                D -> R: Mirror - 180     1  1
+                R -> U: Mirror - 270     1  1
+                """
+                if tile.isBendable:
+                    tile.bendImage(-1 * rotate * tile.getDirection() * -90, rotate == 1)
+                else:
+                    tile.rotateTile(rotate)
+
+        # Allow movement again
+        self.allowMove = True
 
 
 class Direction(IntEnum):
@@ -121,12 +145,14 @@ class SnakeTile(Image):
 
         self.direction = Direction.UP
         self.isBendable = tileType == "body"
+        self.isTail = tileType == "tail"
+
+        self.defaultImage = self.image
 
         if self.isBendable:
-            self.bendImage = pygame.transform.smoothscale(
+            self.cornerImage = pygame.transform.smoothscale(
                 pygame.image.load(os.path.join(path, image.replace(tileType, "corner"))).convert(), size
             )
-            self.defaultImage = self.image
 
     def getDirection(self) -> Direction:
         """
@@ -147,7 +173,15 @@ class SnakeTile(Image):
         Returns: None
         """
 
-        diff = self.direction - direction
+        if not self.isTail:
+            rotate = self.getRotateTile(direction)
+            self.rotateTile(rotate)
+
+        self.direction = direction
+
+    def getRotateTile(self, newDirection) -> int:
+        diff = self.getDirectionDiff(newDirection)
+
         """
         rotate right if:
             U -> R, R -> D, D -> L, L -> U
@@ -160,8 +194,18 @@ class SnakeTile(Image):
                -3  ,   1   ,   1   ,   1
         """
         if diff == -1 or diff == 3:
-            self.image = pygame.transform.rotate(self.image, -90)
+            return -1
         elif diff == 1 or diff == -3:
-            self.image = pygame.transform.rotate(self.image, 90)
+            return 1
+        else:
+            return 0
 
-        self.direction = direction
+    def rotateTile(self, rotation):
+        self.image = pygame.transform.rotate(self.defaultImage, rotation * 90)
+        self.defaultImage = self.image
+
+    def getDirectionDiff(self, newDirection):
+        return self.direction - newDirection
+
+    def bendImage(self, angle, flip):
+        self.image = pygame.transform.flip(pygame.transform.rotate(self.cornerImage, angle), flip, False)
