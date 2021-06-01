@@ -48,6 +48,7 @@ class Game:
         """
         Main loop of the application.
         Calls methods self.updateEvents(), self.updateGameState() and self.updateScreen() while self.isRunning is true
+        !DO NOT OVERWRITE THIS METHOD!
         """
 
         while self.isRunning:
@@ -65,6 +66,7 @@ class Game:
         """
         This functions gets every pygame event and handles quit and pause.
         Unhandled Events are passed down to self.handleEvent() to be handled by children classes.
+        !DO NOT OVERWRITE THIS METHOD!
         """
 
         self.events = pygame.event.get()
@@ -88,7 +90,8 @@ class Game:
 
     def handleEvent(self, event):
         """
-        This method specifies game-specific behavior on pygame events
+        This method specifies game-specific behavior on pygame events.
+        Overwrite this method in your class!
 
         Args:
             event (pygame.event.Event): The to be handled event
@@ -106,7 +109,7 @@ class Game:
 
     def updateScreen(self):
         """
-        This method updates the pygame window by drawing object.
+        This method updates the pygame window by drawing objects.
         It also handles the pause behaviour.
         """
 
@@ -372,7 +375,7 @@ class Image(pygame.sprite.Sprite):
         Returns: None
         """
 
-        self.rect = rect
+        self.rect = pygame.rect.Rect(rect)
 
     def getImage(self) -> pygame.surface.Surface:
         """
