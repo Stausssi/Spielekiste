@@ -26,8 +26,16 @@ class Ball:
         ball_rect = self.image.getRect()
         return ball_rect.colliderect(player.image.getRect())
 
-    def flipVelocity(self):
-        self.speed = (-self.speed[0], self.speed[1])
+    def did_collide_top_bottom(self):
+        y_coord = self.image.getY()
+        return y_coord < 0 or (y_coord + self.SIZE[1]) > Configuration.windowHeight
+
+    def flipVelocity(self, mode="x"):
+        # can only flip velocity again after it travelled for 20 pixels
+        if mode is "x":
+            self.speed = (-self.speed[0], self.speed[1])
+        elif mode is "y":
+            self.speed = (self.speed[0], -self.speed[1])
 
     def move(self):
         new_x = self.image.getX() + self.speed[0]
@@ -115,7 +123,10 @@ class Pong(Game):
 
         # collision
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
-            self.ball.flipVelocity()
+            self.ball.flipVelocity(mode="x")
+
+        if self.ball.did_collide_top_bottom():
+            self.ball.flipVelocity(mode="y")  # flip velocity vector on y-axis
 
     def updateScreen(self):
         # fill game display black
