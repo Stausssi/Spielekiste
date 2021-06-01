@@ -130,12 +130,12 @@ class Game:
         """
 
         if position is None:
-            position = image.rect
+            position = image.getRect()
 
         if surface is None:
             surface = self.surface
 
-        surface.blit(image.image, position)
+        surface.blit(image.getImage(), position)
 
     def drawMenu(self, menu=None):
         """
@@ -352,3 +352,45 @@ class Image(pygame.sprite.Sprite):
         """
 
         self.rect.y = y
+
+    def getRect(self) -> pygame.rect.Rect:
+        """
+        This method returns the rect of the image.
+
+        Returns: The rect of the image
+        """
+
+        return self.rect
+
+    def setRect(self, rect):
+        """
+        This method updates the rect of the image.
+
+        Args:
+            rect (pygame.rect.Rect): The new rect object
+
+        Returns: None
+        """
+
+        self.rect = rect
+
+    def getImage(self) -> pygame.surface.Surface:
+        """
+        This method returns the image surface of the image.
+
+        Returns: The image surface of the image
+        """
+
+        return self.image
+
+    def setImage(self, image):
+        """
+        This method updates the image of the image.
+
+        Args:
+            image (pygame.surface.Surface): The new image surface
+
+        Returns: None
+        """
+
+        self.image = image
