@@ -1,6 +1,6 @@
 class Configuration:
     """
-    A static configuration class containing the most important values, such as windows size, etc.
+    A static configuration class containing the most important values, such as window size, etc.
     """
 
     windowWidth, windowHeight = 1920, 1080
