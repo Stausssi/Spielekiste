@@ -71,13 +71,18 @@ class Game:
 
         # Loop through every event
         for event in self.events:
+            eventHandled = False
+            
             if event.type == pygame.QUIT:
                 self.quit()
+                eventHandled = True
             if event.type == pygame.KEYDOWN:
                 # Toggle pause on ESC
                 if event.key == pygame.K_ESCAPE:
                     self.togglePause()
-            else:
+                    eventHandled = True
+
+            if not eventHandled:
                 # further event handling
                 self.handleEvent(event)
 
