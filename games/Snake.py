@@ -1,4 +1,6 @@
 import os
+import random
+
 import pygame
 from enum import IntEnum
 
@@ -26,7 +28,13 @@ class Snake(Game):
         self.borderRect = pygame.rect.Rect(self.startX, self.startY, self.width, self.height)
 
         snakeX = self.startX + halfWidth
+        if Configuration.SNAKE_TILES_X % 2 == 1:
+            snakeX += Configuration.SNAKE_TILE_SIZE // 2
+
         snakeY = self.startY + halfHeight
+        if Configuration.SNAKE_TILES_Y % 2 == 0:
+            snakeY -= Configuration.SNAKE_TILE_SIZE // 2
+
         self.snakeTiles = [
             SnakeTile(snakeX, snakeY - Configuration.SNAKE_TILE_SIZE, "head"),
             SnakeTile(snakeX, snakeY, "body"),
@@ -37,7 +45,12 @@ class Snake(Game):
         self.head = self.snakeTiles[0]
         self.currentDirection = Direction.UP
         self.tickCounter = 0
+        self.score = 0
+        self.speed = 5
         self.allowMove = True
+
+        self.food = None
+        self.updateFood()
 
         self.run()
 
@@ -64,15 +77,20 @@ class Snake(Game):
         # Draw border
         pygame.draw.rect(self.surface, (255, 0, 0), self.borderRect, 5)
 
+        # Draw Snake
         for tile in self.snakeTiles:
             self.drawImageOnSurface(tile)
+
+        # Draw food
+        self.drawImageOnSurface(self.food)
 
         super().updateScreen()
 
     def updateGameState(self):
         # Update the position of the head if enough ticks passed (2 times a second)
-        if self.tickCounter % 10 == 0:
+        if self.tickCounter % (Configuration.FRAMERATE // self.speed) == 0:
             self.updateSnakeTiles()
+            self.eatFood()
 
         # Increase the tick counter
         self.tickCounter += 1
@@ -148,9 +166,35 @@ class Snake(Game):
         # Intersection with the tail is not possible since the tail will move away
         noIntersect = True
         for bodyIndex in range(1, len(self.snakeTiles) - 1):
-            noIntersect = noIntersect
+            tile = self.snakeTiles[bodyIndex]
+            if tile.getRect() == self.head.getRect():
+                noIntersect = False
+                break
 
         return noIntersect and inBounds
+
+    def eatFood(self):
+        # print(f"Food: {self.food.getRect()}, Head: {self.head.getRect()}")
+        if self.food.getRect() == self.head.getRect():
+            self.score += 100
+            self.speed += 0.5
+
+            self.updateFood()
+
+    def updateFood(self):
+        newX = self.head.getX()
+        newY = self.head.getY()
+        while newX in [tile.getX() for tile in self.snakeTiles] and newY in [tile.getY() for tile in self.snakeTiles]:
+            newX = random.randrange(self.startX, self.startX + self.width, Configuration.SNAKE_TILE_SIZE)
+            newY = random.randrange(self.startY, self.startY + self.height, Configuration.SNAKE_TILE_SIZE)
+
+        self.food = Image(
+            x=newX,
+            y=newY,
+            size=(Configuration.SNAKE_TILE_SIZE, Configuration.SNAKE_TILE_SIZE),
+            image=f"food_{Configuration.SNAKE_FOOD[random.randint(1, 2)]}.png",
+            pathToImage="images/Snake"
+        )
 
 
 class Direction(IntEnum):

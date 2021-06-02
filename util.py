@@ -60,7 +60,7 @@ class Game:
             self.updateScreen()
 
             # Target 60 FPS
-            self.clock.tick(60)
+            self.clock.tick(Configuration.FRAMERATE)
 
     def updateEvents(self):
         """
