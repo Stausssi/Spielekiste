@@ -7,4 +7,6 @@ class Configuration:
     windowSize = (windowWidth, windowHeight)
 
     SNAKE_TILE_SIZE = 50
+    SNAKE_TILES_X = 20
+    SNAKE_TILES_Y = 15
 

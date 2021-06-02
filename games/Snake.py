@@ -16,12 +16,22 @@ class Snake(Game):
         """
 
         super().__init__()
+        self.width = Configuration.SNAKE_TILES_X * Configuration.SNAKE_TILE_SIZE
+        self.height = Configuration.SNAKE_TILES_Y * Configuration.SNAKE_TILE_SIZE
 
+        halfWidth = self.width // 2
+        halfHeight = self.height // 2
+        self.startX = Configuration.windowWidth // 2 - halfWidth
+        self.startY = Configuration.windowHeight // 2 - halfHeight
+        self.borderRect = pygame.rect.Rect(self.startX, self.startY, self.width, self.height)
+
+        snakeX = self.startX + halfWidth
+        snakeY = self.startY + halfHeight
         self.snakeTiles = [
-            SnakeTile(25, 25, "head"),
-            SnakeTile(25, 26, "body"),
-            SnakeTile(25, 27, "body"),
-            SnakeTile(25, 28, "tail")
+            SnakeTile(snakeX, snakeY - Configuration.SNAKE_TILE_SIZE, "head"),
+            SnakeTile(snakeX, snakeY, "body"),
+            SnakeTile(snakeX, snakeY + Configuration.SNAKE_TILE_SIZE, "body"),
+            SnakeTile(snakeX, snakeY + 2 * Configuration.SNAKE_TILE_SIZE, "tail")
         ]
 
         self.head = self.snakeTiles[0]
@@ -48,7 +58,11 @@ class Snake(Game):
                 self.allowMove = True
 
     def updateScreen(self):
-        self.surface.fill((0, 0, 0))
+        # Fill Background
+        self.surface.fill((0, 255, 0))
+
+        # Draw border
+        pygame.draw.rect(self.surface, (255, 0, 0), self.borderRect, 5)
 
         for tile in self.snakeTiles:
             self.drawImageOnSurface(tile)
@@ -57,64 +71,86 @@ class Snake(Game):
 
     def updateGameState(self):
         # Update the position of the head if enough ticks passed (2 times a second)
-        if self.tickCounter % 30 == 0:
+        if self.tickCounter % 10 == 0:
             self.updateSnakeTiles()
 
         # Increase the tick counter
         self.tickCounter += 1
 
     def updateSnakeTiles(self):
-        # Update the direction and position of every other element
-        for index in range(len(self.snakeTiles) - 1, 0, -1):
-            # Retrieve direction and position of the previous element
-            prevTile = self.snakeTiles[index - 1]
-            prevDirection = prevTile.getDirection()
-            prevPos = prevTile.getRect()
-
-            # Set direction and position to the values of the previous Element
-            tile = self.snakeTiles[index]
-            tile.setDirection(prevDirection)
-            tile.setRect(prevPos)
-
-        # Update the direction of the head
-        self.head.setDirection(self.currentDirection)
-
-        # Move the head depending on the direction
+        # Check whether the next field is valid
         if self.currentDirection == Direction.UP:
-            self.head.setY(self.head.getY() - Configuration.SNAKE_TILE_SIZE)
+            nextX = self.head.getX()
+            nextY = self.head.getY() - Configuration.SNAKE_TILE_SIZE
         elif self.currentDirection == Direction.RIGHT:
-            self.head.setX(self.head.getX() + Configuration.SNAKE_TILE_SIZE)
+            nextX = self.head.getX() + Configuration.SNAKE_TILE_SIZE
+            nextY = self.head.getY()
         elif self.currentDirection == Direction.DOWN:
-            self.head.setY(self.head.getY() + Configuration.SNAKE_TILE_SIZE)
-        elif self.currentDirection == Direction.LEFT:
-            self.head.setX(self.head.getX() - Configuration.SNAKE_TILE_SIZE)
+            nextX = self.head.getX()
+            nextY = self.head.getY() + Configuration.SNAKE_TILE_SIZE
+        else:  # LEFT
+            nextX = self.head.getX() - Configuration.SNAKE_TILE_SIZE
+            nextY = self.head.getY()
 
-        # Check whether a snake tile is at a corner and change the picture if so
-        for index in range(1, len(self.snakeTiles)):
-            prevDirection = self.snakeTiles[index - 1].getDirection()
+        if self.isValidField(nextX, nextY):
+            # Update the direction and position of every other element
+            for index in range(len(self.snakeTiles) - 1, 0, -1):
+                # Retrieve direction and position of the previous element
+                prevTile = self.snakeTiles[index - 1]
+                prevDirection = prevTile.getDirection()
+                prevPos = prevTile.getRect()
 
-            tile = self.snakeTiles[index]
-            rotate = tile.getRotateTile(prevDirection)
-            if rotate != 0:
-                """
-                The angle depends on the direction switch
-                U -> R: 0       -1  -1
-                R -> D: 90      -1  -1
-                D -> L: 180     -1  -1
-                L -> U: 270      3  -1
-                
-                U -> L: Mirror          -3  1
-                L -> D: Mirror - 90      1  1
-                D -> R: Mirror - 180     1  1
-                R -> U: Mirror - 270     1  1
-                """
-                if tile.isBendable:
-                    tile.bendImage(-1 * rotate * tile.getDirection() * -90, rotate == 1)
-                else:
-                    tile.rotateTile(rotate)
+                # Set direction and position to the values of the previous Element
+                tile = self.snakeTiles[index]
+                tile.setDirection(prevDirection)
+                tile.setRect(prevPos)
+
+            # Update the direction of the head
+            self.head.setDirection(self.currentDirection)
+
+            # Move the head to the new position
+            self.head.setX(nextX)
+            self.head.setY(nextY)
+
+            # Check whether a snake tile is at a corner and change the picture if so
+            for index in range(1, len(self.snakeTiles)):
+                prevDirection = self.snakeTiles[index - 1].getDirection()
+
+                tile = self.snakeTiles[index]
+                rotate = tile.getRotateTile(prevDirection)
+                if rotate != 0:
+                    """
+                    The angle depends on the direction switch
+                    U -> R: 0       -1  -1
+                    R -> D: 90      -1  -1
+                    D -> L: 180     -1  -1
+                    L -> U: 270      3  -1
+                    
+                    U -> L: Mirror          -3  1
+                    L -> D: Mirror - 90      1  1
+                    D -> R: Mirror - 180     1  1
+                    R -> U: Mirror - 270     1  1
+                    """
+                    if tile.isBendable:
+                        tile.bendImage(-1 * rotate * tile.getDirection() * -90, rotate == 1)
+                    else:
+                        tile.rotateTile(rotate)
 
         # Allow movement again
         self.allowMove = True
+
+    def isValidField(self, x, y):
+        inBounds = \
+            self.startX <= x < self.startX + self.width and \
+            self.startY <= y < self.startY + self.height
+
+        # Check for intersection with a body tile.
+        # Intersection with the tail is not possible since the tail will move away
+        noIntersect = True
+        for bodyIndex in range(1, len(self.snakeTiles) - 1):
+            noIntersect = noIntersect
+
+        return noIntersect and inBounds
 
 
 class Direction(IntEnum):
@@ -136,8 +172,8 @@ class SnakeTile(Image):
         size = (Configuration.SNAKE_TILE_SIZE, Configuration.SNAKE_TILE_SIZE)
 
         super().__init__(
-            x=x * Configuration.SNAKE_TILE_SIZE,
-            y=y * Configuration.SNAKE_TILE_SIZE,
+            x=x,
+            y=y + Configuration.SNAKE_TILE_SIZE // 2,
             size=size,
             image=image,
             pathToImage=path
