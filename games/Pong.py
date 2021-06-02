@@ -4,44 +4,54 @@ from util import Game, Image
 from config import Configuration
 
 
-class Player:
-    def __init__(self, xpos, ypos):
-        # image
-        self.SIZE = (20, 100)
-        self.image = Image(xpos, ypos, self.SIZE, "plane.png")
+class Player(Image):
+    def __init__(self, x, y):
+        player_size = (20, 100)
+        super().__init__(x, y, player_size, "plane.png")
 
         # movement flags
         self.move_up = False
         self.move_down = False
 
+    def move(self):
+        speed = 0
+        if self.move_up:
+            if self.getY() > 20:
+                speed = -10
+        if self.move_down:
+            if self.getY() < (Configuration.windowHeight - 20 - self.SIZE[1]):
+                speed = 10
+        self.setY(self.getY() + speed)
 
-class Ball:
-    def __init__(self, xpos, ypos):
-        # image
-        self.SIZE = (20, 20)
-        self.image = Image(xpos, ypos, self.SIZE, "ball.png")
+
+class Ball(Image):
+    def __init__(self, x, y):
+        ball_size = (20, 20)
+        super().__init__(x, y, ball_size, "ball.png")
+
+        # speed
         self.speed = (5, 2)
 
     def didCollideWithPlayer(self, player: Player):
-        ball_rect = self.image.getRect()
-        return ball_rect.colliderect(player.image.getRect())
+        ball_rect = self.getRect()
+        return ball_rect.colliderect(player.getRect())
 
     def did_collide_top_bottom(self):
-        y_coord = self.image.getY()
+        y_coord = self.getY()
         return y_coord < 0 or (y_coord + self.SIZE[1]) > Configuration.windowHeight
 
     def flipVelocity(self, mode="x"):
         # can only flip velocity again after it travelled for 20 pixels
-        if mode is "x":
+        if mode == "x":
             self.speed = (-self.speed[0], self.speed[1])
-        elif mode is "y":
+        elif mode == "y":
             self.speed = (self.speed[0], -self.speed[1])
 
     def move(self):
-        new_x = self.image.getX() + self.speed[0]
-        new_y = self.image.getY() + self.speed[1]
-        self.image.setX(new_x)
-        self.image.setY(new_y)
+        new_x = self.getX() + self.speed[0]
+        new_y = self.getY() + self.speed[1]
+        self.setX(new_x)
+        self.setY(new_y)
 
 
 class Pong(Game):
@@ -98,30 +108,12 @@ class Pong(Game):
     def updateGameState(self):
         # borders, movement handling
 
-        player_one_y = self.player_one.image.getY()
-        player_two_y = self.player_two.image.getY()
-        speed1 = 0
-        speed2 = 0
-
-        if self.player_one.move_up:
-            if player_one_y > 20:
-                speed1 = -10
-        if self.player_one.move_down:
-            if player_one_y < (Configuration.windowHeight - 20 - self.player_one.SIZE[1]):
-                speed1 = 10
-        if self.player_two.move_up:
-            if player_two_y > 20:
-                speed2 = -10
-        if self.player_two.move_down:
-            if player_two_y < (Configuration.windowHeight - 20 - self.player_two.SIZE[1]):
-                speed2 = 10
-
         # movement update
         self.ball.move()
-        self.player_one.image.setY(player_one_y + speed1)
-        self.player_two.image.setY(player_two_y + speed2)
+        self.player_one.move()
+        self.player_two.move()
 
-        # collision
+        # collision handling
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
             self.ball.flipVelocity(mode="x")
 
@@ -133,9 +125,9 @@ class Pong(Game):
         self.surface.fill((0, 0, 0))
 
         # draw players and ball
-        self.drawImageOnSurface(self.player_one.image)
-        self.drawImageOnSurface(self.player_two.image)
-        self.drawImageOnSurface(self.ball.image)
+        self.drawImageOnSurface(self.player_one)
+        self.drawImageOnSurface(self.player_two)
+        self.drawImageOnSurface(self.ball)
 
         # draw players and ball
 
