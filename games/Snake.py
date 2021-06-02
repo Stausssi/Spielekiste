@@ -162,10 +162,9 @@ class Snake(Game):
             self.startX <= x < self.startX + self.width and \
             self.startY <= y < self.startY + self.height
 
-        # Check for intersection with a body tile.
-        # Intersection with the tail is not possible since the tail will move away
+        # Check for intersection with a tile
         noIntersect = True
-        for bodyIndex in range(1, len(self.snakeTiles) - 1):
+        for bodyIndex in range(1, len(self.snakeTiles)):
             tile = self.snakeTiles[bodyIndex]
             if tile.getRect() == self.head.getRect():
                 noIntersect = False
@@ -174,12 +173,19 @@ class Snake(Game):
         return noIntersect and inBounds
 
     def eatFood(self):
-        # print(f"Food: {self.food.getRect()}, Head: {self.head.getRect()}")
         if self.food.getRect() == self.head.getRect():
             self.score += 100
             self.speed += 0.5
 
             self.updateFood()
+
+            # Add a tile to the snakes body
+            pos = len(self.snakeTiles) - 2
+            lastBodyTile = self.snakeTiles[pos]
+            self.snakeTiles.insert(
+                pos,
+                lastBodyTile.__copy__()
+            )
 
     def updateFood(self):
         newX = self.head.getX()
@@ -233,6 +239,16 @@ class SnakeTile(Image):
             self.cornerImage = pygame.transform.smoothscale(
                 pygame.image.load(os.path.join(path, image.replace(tileType, "corner"))).convert(), size
             )
+
+    def __copy__(self):
+        cloneTile = SnakeTile(self.getX(), self.getY(), "body")
+        cloneTile.direction = self.direction
+        cloneTile.image = self.image
+        cloneTile.cornerImage = self.cornerImage
+        cloneTile.defaultImage = self.defaultImage
+        cloneTile.rect = self.rect
+
+        return cloneTile
 
     def getDirection(self) -> Direction:
         """
