@@ -3,7 +3,7 @@ import pygame
 from enum import IntEnum
 from threading import Timer
 
-from config import Configuration
+from config import Configuration, Colors
 from util import Game, Image
 
 
@@ -18,6 +18,18 @@ class Snake(Game):
         """
 
         super().__init__(title=Configuration.windowTitle + " | Snake")
+
+        # Calc width and height of the field
+        self.width = Configuration.SNAKE_TILES_X * Configuration.SNAKE_TILE_SIZE
+        self.height = Configuration.SNAKE_TILES_Y * Configuration.SNAKE_TILE_SIZE
+
+        halfWidth = self.width // 2
+        halfHeight = self.height // 2
+
+        # Calculate the upper left corner of the game field
+        self.startX = Configuration.windowWidth // 2 - halfWidth
+        self.startY = Configuration.windowHeight // 2 - halfHeight
+        self.borderRect = pygame.rect.Rect(self.startX, self.startY, self.width, self.height)
 
         # Initialize the background image
         self.backgroundImage = Image(
@@ -39,18 +51,6 @@ class Snake(Game):
             "death": pygame.mixer.Sound("sounds/snake/death.wav")
         }
 
-        # Calc width and height of the field
-        self.width = Configuration.SNAKE_TILES_X * Configuration.SNAKE_TILE_SIZE
-        self.height = Configuration.SNAKE_TILES_Y * Configuration.SNAKE_TILE_SIZE
-
-        halfWidth = self.width // 2
-        halfHeight = self.height // 2
-
-        # Calculate the upper left corner of the game field
-        self.startX = Configuration.windowWidth // 2 - halfWidth
-        self.startY = Configuration.windowHeight // 2 - halfHeight
-        self.borderRect = pygame.rect.Rect(self.startX, self.startY, self.width, self.height)
-
         # Position the snake in the middle of the field
         # If width or height is odd add half of a snake tile to stay centered
         snakeX = self.startX + halfWidth + (Configuration.SNAKE_TILES_X % 2) * Configuration.SNAKE_TILE_SIZE // 2
@@ -70,7 +70,6 @@ class Snake(Game):
         self.currentDirection = Direction.UP
 
         self.tickCounter = 0
-        self.speed = 4
         self.allowMove = True
         self.hasDied = False
         self.isGameOver = False
@@ -101,6 +100,16 @@ class Snake(Game):
                 self.allowMove = True
 
     def updateScreen(self):
+        # Draw checkers background
+        size = Configuration.SNAKE_TILE_SIZE
+        for x in range(self.startX, self.startX + self.width, size):
+            for y in range(self.startY, self.startY + self.height, size):
+                if (x // 50 + y // 50) % 2 == 1:
+                    color = Colors.LightGreen
+                else:
+                    color = Colors.VeryLightGreen
+                pygame.draw.rect(self.surface, color, (x, y, size, size))
+
         # Draw border
         pygame.draw.rect(self.surface, (255, 0, 0), self.borderRect, 5)
 
@@ -152,6 +161,10 @@ class Snake(Game):
 
         # Check if head is allowed to move on the new field
         if self.isValidField(nextX, nextY):
+            # Save the state of the tiles
+            for tile in self.snakeTiles:
+                tile.saveState()
+
             # Update the direction and position of every tile except the head
             # Dont update the new tile and tail if food was eaten
             startIndex = len(self.snakeTiles) - 1
@@ -248,14 +261,12 @@ class Snake(Game):
             # Reposition the food item
             self.updateFood()
 
-            # Add a tile to the snakes body
-            pos = len(self.snakeTiles) - 2
-            existingTile = self.snakeTiles[pos]
-
             # Insert a deepcopy of the existing body AFTER the existing tile
+            pos = len(self.snakeTiles) - 2
+
             self.snakeTiles.insert(
                 pos + 1,
-                existingTile.__copy__()
+                self.snakeTiles[pos].__copy__()
             )
 
             self.foodEaten = True
@@ -268,19 +279,20 @@ class Snake(Game):
         """
 
         # Create a new pair of coordinates
-        newX = self.head.getX()
-        newY = self.head.getY()
+        newRect = self.head.getRect()
 
         # Choose new random positions if the random coordinate is inside the snake
-        while newX in [tile.getX() for tile in self.snakeTiles] and newY in [tile.getY() for tile in self.snakeTiles]:
+        while newRect in [tile.getRect() for tile in self.snakeTiles]:
             newX = random.randrange(self.startX, self.startX + self.width, Configuration.SNAKE_TILE_SIZE)
             newY = random.randrange(self.startY, self.startY + self.height, Configuration.SNAKE_TILE_SIZE)
+
+            newRect = pygame.rect.Rect(newX, newY, Configuration.SNAKE_TILE_SIZE, Configuration.SNAKE_TILE_SIZE)
 
         # Create the food item at the created position
         # Choose a random image
         self.food = Image(
-            x=newX,
-            y=newY,
+            x=newRect.x,
+            y=newRect.y,
             size=(Configuration.SNAKE_TILE_SIZE, Configuration.SNAKE_TILE_SIZE),
             image=f"food_{Configuration.SNAKE_FOOD[random.randint(0, len(Configuration.SNAKE_FOOD) - 1)]}.png",
             pathToImage="images/Snake"
@@ -380,11 +392,11 @@ class SnakeTile(Image):
         cloneTile = SnakeTile(self.getX(), self.getY(), self.tileType)
         cloneTile.direction = self.direction
         cloneTile.image = self.image.copy()
-        if self.isBendable:
-            cloneTile.cornerImage.setImage(self.cornerImage.getImage().copy())
+        if cloneTile.isBendable:
+            cloneTile.cornerImage.image = self.cornerImage.getImage().copy()
 
         cloneTile.defaultImage = self.defaultImage.copy()
-        cloneTile.rect = self.rect
+        cloneTile.rect = pygame.rect.Rect(self.rect)
         cloneTile.prevState = self.getPreviousState()
 
         return cloneTile
@@ -400,8 +412,6 @@ class SnakeTile(Image):
         Returns: None
         """
 
-        self.prevState = self.__copy__()
-
         self.setRect(rect)
         self.setDirection(direction)
 
@@ -413,6 +423,15 @@ class SnakeTile(Image):
         """
 
         return self.prevState
+
+    def saveState(self):
+        """
+        This method saves a copy of the element to the prevState variable.
+
+        Returns: None
+        """
+
+        self.prevState = self.__copy__()
 
     def getDirection(self) -> Direction:
         """
