@@ -19,9 +19,8 @@ class Game:
             windowSize (tuple[int, int]): The size of the pygame window
         """
 
-        self.title = title
-
         self.isRunning = True
+        self.isGameOver = False
         self.isPaused = False
         self.windowSize = windowSize
         self.events = None
@@ -30,10 +29,18 @@ class Game:
 
         # Pygame specific stuff
         pygame.init()
-        pygame.display.set_caption(self.title)
 
+        # Display
+        pygame.display.set_caption(title)
         self.surface = pygame.display.set_mode(size=self.windowSize)
+        self.backgroundImage = None
 
+        # Music
+        pygame.mixer.init()
+        self.backgroundMusic = None
+        self.sounds = {}
+
+        # Create the pause menu
         self.pauseMenu = pygame_menu.Menu(
             title="Spiel pausiert",
             width=self.windowSize[0] / 2,
@@ -45,6 +52,7 @@ class Game:
 
         self.pauseBehaviour = self.drawMenu
 
+        # Create variables needed for the game end screen
         self.score = 0
         self.nameSubmit = False
         self.nameInputX, self.nameInputY = (Configuration.windowWidth // 2, Configuration.windowHeight // 2)
@@ -59,37 +67,34 @@ class Game:
     def run(self):
         """
         Main loop of the application.
-        Calls methods self.updateEvents(), self.updateGameState() and self.updateScreen() while self.isRunning is true
         Calls methods self.updateEvents(), self.updateGameState() and self.updateScreen() while self.isRunning is True.
         If self.isRunning is False, self.gameOver() will be called to ask the user for their name.
         
         !DO NOT OVERWRITE THIS METHOD!
         """
 
+        # Play background music
+        if self.backgroundMusic is not None:
+            pygame.mixer.music.load(self.backgroundMusic)
+            pygame.mixer.music.play(-1)
+
+        # Main loop
         while self.isRunning:
             self.updateEvents()
 
             if not self.isPaused:
                 self.updateGameState()
 
+            if self.backgroundImage is not None:
+                self.drawImageOnSurface(self.backgroundImage)
+
             self.updateScreen()
 
             # Target 60 FPS
             self.clock.tick(Configuration.FRAMERATE)
 
-        self.gameOver()
-
-    def gameOver(self):
-        """
-        This method is called once the game finished.
-        It asks the user to input a name and saves their score afterwards.
-
-        Returns: None
-        """
-
-        # Ask the user for their name to save the score
-        name = self.getUserName()
-        self.saveScore(name)
+        if self.isGameOver:
+            self.gameOver()
 
     def updateEvents(self, nameInput=False):
         """
@@ -148,8 +153,8 @@ class Game:
 
     def updateScreen(self):
         """
-        This method updates the pygame window by drawing objects.
-        It also handles the pause behaviour.
+        This method updates the pygame window.
+        It also handles pause behaviour.
         """
 
         if self.isPaused:
@@ -201,6 +206,32 @@ class Game:
         """
 
         self.isPaused = not self.isPaused
+
+    def playSound(self, sound):
+        """
+        This method plays a sound.
+
+        Args:
+            sound (str): The name of the sound
+
+        Returns: None
+        """
+        sound = self.sounds[sound]
+
+        if sound:
+            sound.play()
+
+    def gameOver(self):
+        """
+        This method is called once the game finished.
+        It asks the user to input a name and saves their score afterwards.
+
+        Returns: None
+        """
+
+        # Ask the user for their name to save the score
+        name = self.getUserName()
+        self.saveScore(name)
 
     def getUserName(self) -> str:
         """
