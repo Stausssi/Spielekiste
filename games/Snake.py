@@ -101,9 +101,6 @@ class Snake(Game):
                 self.allowMove = True
 
     def updateScreen(self):
-        # Fill Background
-        self.surface.fill((0, 255, 0))
-
         # Draw border
         pygame.draw.rect(self.surface, (255, 0, 0), self.borderRect, 5)
 
@@ -112,12 +109,11 @@ class Snake(Game):
         for tile in reversed(self.snakeTiles):
             self.drawImageOnSurface(tile)
 
-        if not self.isGameOver:
-            if self.hasDied:
-                self.animateDeath()
+        # Draw food
+        self.drawImageOnSurface(self.food)
 
-            # Draw food
-            self.drawImageOnSurface(self.food)
+        if self.hasDied and not self.isGameOver:
+            self.animateDeath()
 
         super().updateScreen()
 
