@@ -19,6 +19,25 @@ class Snake(Game):
 
         super().__init__(title=Configuration.windowTitle + " | Snake")
 
+        # Initialize the background image
+        self.backgroundImage = Image(
+            x=0,
+            y=0,
+            size=Configuration.windowSize,
+            image="snake_background.png",
+            pathToImage="images/snake",
+            hasColorkey=False
+        )
+
+        # Initialize background music
+        self.backgroundMusic = None  # "sounds/snake/background.mp3"
+        self.sounds = {
+            # https://mixkit.co/free-sound-effects/eat/ "Chewing something crunchy":
+            "food": pygame.mixer.Sound("sounds/snake/food.wav"),
+            # https://mixkit.co/free-sound-effects/arcade/ "Arcade retro game over"
+            "death": pygame.mixer.Sound("sounds/snake/death.wav")
+        }
+
         # Calc width and height of the field
         self.width = Configuration.SNAKE_TILES_X * Configuration.SNAKE_TILE_SIZE
         self.height = Configuration.SNAKE_TILES_Y * Configuration.SNAKE_TILE_SIZE
@@ -105,7 +124,7 @@ class Snake(Game):
         if not self.isGameOver:
             # Update the position of the tiles if enough ticks passed, specified by self.speed
             # Also check for food and eat if there is any
-            if self.tickCounter % (Configuration.FRAMERATE // self.speed) == 0 and not self.hasDied:
+            if self.tickCounter % Configuration.SNAKE_SPEED == 0 and not self.hasDied:
                 self.updateSnakeTiles()
                 self.eatFood()
 
@@ -119,8 +138,6 @@ class Snake(Game):
 
         Returns: None
         """
-
-        # TODO: Consider adding an animation
 
         # Calculate the coordinates of the new field the head is moving on
         if self.currentDirection == Direction.UP:
@@ -225,15 +242,11 @@ class Snake(Game):
         Returns: None
         """
 
-        # TODO: Maybe add animation
-
         # Check whether the head is on top of a food
         if self.food.getRect() == self.head.getRect():
             self.score += 100
 
-            # Increase the speed, if it's not already maxed out
-            if self.speed < Configuration.SNAKE_MAX_SPEED:
-                self.speed += 0.5
+            self.playSound("food")
 
             # Reposition the food item
             self.updateFood()
@@ -282,6 +295,9 @@ class Snake(Game):
 
         Returns: None
         """
+
+        # Play death sound
+        self.playSound("death")
 
         # Reset the tiles to their previous state
         self.snakeTiles = [tile.getPreviousState() for tile in self.snakeTiles]
