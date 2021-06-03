@@ -7,7 +7,7 @@ from config import Configuration
 
 
 class Game:
-    def __init__(self, title="Niklas und Simons Spielekiste", windowSize=Configuration.windowSize):
+    def __init__(self, title=Configuration.windowTitle, windowSize=Configuration.windowSize):
         """
         Superclass for every component in this application.
 
@@ -236,7 +236,8 @@ class Game:
         Returns: None
         """
 
-        print(self.score, name)
+        # print(self.score, name)
+        pass
 
     def quit(self):
         """
