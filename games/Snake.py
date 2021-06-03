@@ -56,6 +56,8 @@ class Snake(Game):
         self.score = 0
         self.speed = 4
         self.allowMove = True
+        self.hasDied = False
+        self.isGameOver = False
 
         # Position food randomly on the field
         self.food = None
@@ -94,20 +96,25 @@ class Snake(Game):
         for tile in reversed(self.snakeTiles):
             self.drawImageOnSurface(tile)
 
-        # Draw food
-        self.drawImageOnSurface(self.food)
+        if not self.isGameOver:
+            if self.hasDied:
+                self.animateDeath()
+
+            # Draw food
+            self.drawImageOnSurface(self.food)
 
         super().updateScreen()
 
     def updateGameState(self):
-        # Update the position of the tiles if enough ticks passed, specified by self.speed
-        # Also check for food and eat if there is any
-        if self.tickCounter % (Configuration.FRAMERATE // self.speed) == 0:
-            self.updateSnakeTiles()
-            self.eatFood()
+        if not self.isGameOver:
+            # Update the position of the tiles if enough ticks passed, specified by self.speed
+            # Also check for food and eat if there is any
+            if self.tickCounter % (Configuration.FRAMERATE // self.speed) == 0 and not self.hasDied:
+                self.updateSnakeTiles()
+                self.eatFood()
 
-        # Increase the tick counter
-        self.tickCounter += 1
+            # Increase the tick counter
+            self.tickCounter += 1
 
     def updateSnakeTiles(self):
         """
@@ -116,6 +123,8 @@ class Snake(Game):
 
         Returns: None
         """
+
+        # TODO: Consider adding an animation
 
         # Calculate the coordinates of the new field the head is moving on
         if self.currentDirection == Direction.UP:
@@ -147,17 +156,15 @@ class Snake(Game):
                 prevPos = prevTile.getRect()
 
                 # Set direction and position to the values of the previous Element
-                tile = self.snakeTiles[index]
-                tile.setDirection(prevDirection)
-                tile.setRect(prevPos)
+                self.snakeTiles[index].move(prevPos, prevDirection)
 
-            # Update the direction of the head
-            self.head.setDirection(self.currentDirection)
+            # Move the head
+            self.head.move(
+                pygame.rect.Rect(nextX, nextY, Configuration.SNAKE_TILE_SIZE, Configuration.SNAKE_TILE_SIZE),
+                self.currentDirection
+            )
 
-            # Move the head to the new position
-            self.head.setX(nextX)
-            self.head.setY(nextY)
-
+            # Update body tiles to represent corners
             # Check whether a snake body-tile is at a corner and change the picture if so
             for index in range(1, startIndex + 1):
                 prevDirection = self.snakeTiles[index - 1].getDirection()
@@ -171,7 +178,7 @@ class Snake(Game):
                     R -> D: 90      -1
                     D -> L: 180     -1
                     L -> U: 270     -1
-                    
+
                     U -> L: Mirror          1
                     L -> D: Mirror - 90     1
                     D -> R: Mirror - 180    1
@@ -182,8 +189,10 @@ class Snake(Game):
                     else:  # rotate tail
                         tile.rotateTile(rotate)
 
-        # Allow movement again
-        self.allowMove = True
+            # Allow movement again
+            self.allowMove = True
+        else:
+            self.hasDied = True
 
     def isValidField(self, x, y) -> bool:
         """
@@ -219,6 +228,8 @@ class Snake(Game):
 
         Returns: None
         """
+
+        # TODO: Maybe add animation
 
         # Check whether the head is on top of a food
         if self.food.getRect() == self.head.getRect():
@@ -268,6 +279,18 @@ class Snake(Game):
             pathToImage="images/Snake"
         )
 
+    def animateDeath(self):
+        """
+        This method animates the death of the snake by moving the entire body backwards and replacing the head image
+
+        Returns: None
+        """
+
+        # Reset the tiles to their previous state
+        self.snakeTiles = [tile.getPreviousState() for tile in self.snakeTiles]
+
+        self.isGameOver = True
+
 
 class Direction(IntEnum):
     """
@@ -305,6 +328,9 @@ class SnakeTile(Image):
             pathToImage=path
         )
 
+        # Save the type of the tile
+        self.tileType = tileType
+
         # Texture is facing upwards by default
         self.direction = Direction.UP
 
@@ -327,21 +353,55 @@ class SnakeTile(Image):
                 pathToImage=path
             )
 
+        # Save a the previous state to animate the death of the snake
+        self.prevState = None
+
     def __copy__(self):
         """
-        This method deepcopies a snake tile and is using for increasing the length of the snake after eating food
+        This method deepcopies a snake tile and is used for increasing the length of the snake after eating food and
+        saving the previous state of the tile
 
         Returns (SnakeTile): A new SnakeTile object exactly the same as the current object
         """
 
-        cloneTile = SnakeTile(self.getX(), self.getY(), "body")
+        cloneTile = SnakeTile(self.getX(), self.getY(), self.tileType)
         cloneTile.direction = self.direction
-        cloneTile.image = self.image
-        cloneTile.cornerImage = self.cornerImage
-        cloneTile.defaultImage = self.defaultImage
+        cloneTile.image = self.image.copy()
+        if self.isBendable:
+            cloneTile.cornerImage = self.cornerImage
+        cloneTile.defaultImage = self.defaultImage.copy()
         cloneTile.rect = self.rect
+        cloneTile.prevState = self.getPreviousState()
 
         return cloneTile
+
+    def move(self, rect, direction):
+        """
+        Moves the tile to a given position and facing in a specific direction.
+
+        Args:
+            rect (pygame.rect.Rect): The position to move the tile to
+            direction (Direction): The direction the tile will be facing
+
+        Returns: None
+        """
+
+        self.prevState = self.__copy__()
+
+        self.setRect(rect)
+        self.setDirection(direction)
+
+    def setRect(self, rect):
+        super().setRect(rect)
+
+    def getPreviousState(self):
+        """
+        Get the previous state of the tile
+
+        Returns (SnakeTile): A SnakeTile representing the previous state
+        """
+
+        return self.prevState
 
     def getDirection(self) -> Direction:
         """
