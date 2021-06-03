@@ -273,7 +273,10 @@ class Game:
     def quit(self):
         """
         This method is called once the player quits the game.
+        It also stops the background music
         """
+
+        pygame.mixer.music.stop()
 
         self.isRunning = False
 
