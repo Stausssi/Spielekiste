@@ -1,6 +1,7 @@
 import os
 import pygame
 import pygame_menu
+from pygame_textinput import TextInput
 
 from config import Configuration
 
@@ -44,10 +45,22 @@ class Game:
 
         self.pauseBehaviour = self.drawMenu
 
+        self.score = 0
+        self.nameSubmit = False
+        self.nameInputX, self.nameInputY = (Configuration.windowWidth // 2, Configuration.windowHeight // 2)
+        self.nameBackground = Image(
+            x=0,
+            y=0,
+            size=Configuration.windowSize,
+            image="nameInput.png",
+            hasColorkey=False
+        )
+
     def run(self):
         """
         Main loop of the application.
-        Calls methods self.updateEvents(), self.updateGameState() and self.updateScreen() while self.isRunning is true
+        Calls methods self.updateEvents(), self.updateGameState() and self.updateScreen() while self.isRunning is True.
+        If self.isRunning is False, self.gameOver() will be called to ask the user for their name.
         """
 
         while self.isRunning:
@@ -59,12 +72,31 @@ class Game:
             self.updateScreen()
 
             # Target 60 FPS
-            self.clock.tick(60)
+            self.clock.tick(Configuration.FRAMERATE)
 
-    def updateEvents(self):
+        self.gameOver()
+
+    def gameOver(self):
+        """
+        This method is called once the game finished.
+        It asks the user to input a name and saves their score afterwards.
+
+        Returns: None
+        """
+
+        # Ask the user for their name to save the score
+        name = self.getUserName()
+        self.saveScore(name)
+
+    def updateEvents(self, nameInput=False):
         """
         This functions gets every pygame event and handles quit and pause.
         Unhandled Events are passed down to self.handleEvent() to be handled by children classes.
+
+        Args:
+            nameInput (bool): Specifies whether the game is currently waiting for the user to input their name
+
+        Returns: None
         """
 
         self.events = pygame.event.get()
@@ -80,6 +112,10 @@ class Game:
                 # Toggle pause on ESC
                 if event.key == pygame.K_ESCAPE:
                     self.togglePause()
+                    eventHandled = True
+
+                if nameInput and event.key == pygame.K_RETURN:
+                    self.nameSubmit = True
                     eventHandled = True
 
             if not eventHandled:
@@ -159,6 +195,42 @@ class Game:
         """
 
         self.isPaused = not self.isPaused
+
+    def getUserName(self) -> str:
+        """
+        This method shows an input dialog for the user to write their name.
+        The name will be used in the scoreboard.
+
+        Returns: The name of the user as a string
+        """
+
+        nameInput = TextInput()
+
+        while not self.nameSubmit:
+            self.updateEvents(True)
+
+            nameInput.update(self.events)
+
+            self.drawImageOnSurface(self.nameBackground)
+            self.surface.blit(nameInput.get_surface(), (self.nameInputX, self.nameInputY))
+
+            pygame.display.update()
+
+            self.clock.tick(Configuration.FRAMERATE)
+
+        return nameInput.get_text()
+
+    def saveScore(self, name):
+        """
+        This method saves the score of the user in a game
+
+        Args:
+            name (str): The name of the user
+
+        Returns: None
+        """
+
+        print(self.score, name)
 
     def quit(self):
         """

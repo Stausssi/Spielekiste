@@ -5,4 +5,4 @@ class Configuration:
 
     windowWidth, windowHeight = 1920, 1080
     windowSize = (windowWidth, windowHeight)
-
+    FRAMERATE = 60
