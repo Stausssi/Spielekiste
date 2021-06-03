@@ -368,7 +368,8 @@ class SnakeTile(Image):
         cloneTile.direction = self.direction
         cloneTile.image = self.image.copy()
         if self.isBendable:
-            cloneTile.cornerImage = self.cornerImage
+            cloneTile.cornerImage.setImage(self.cornerImage.getImage().copy())
+
         cloneTile.defaultImage = self.defaultImage.copy()
         cloneTile.rect = self.rect
         cloneTile.prevState = self.getPreviousState()
@@ -499,6 +500,3 @@ class SnakeTile(Image):
         """
 
         self.image = pygame.transform.flip(pygame.transform.rotate(self.cornerImage.getImage(), angle), flip, False)
-
-class SnakeHead(SnakeTile):
-    def __init__(self):
