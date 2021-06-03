@@ -49,7 +49,6 @@ class Snake(Game):
         ]
 
         self.head = self.snakeTiles[0]
-
         # Snake is moving up by default
         self.currentDirection = Direction.UP
 
@@ -61,6 +60,7 @@ class Snake(Game):
         # Position food randomly on the field
         self.food = None
         self.updateFood()
+        self.foodEaten = False
 
         # Start the game
         self.run()
@@ -90,7 +90,8 @@ class Snake(Game):
         pygame.draw.rect(self.surface, (255, 0, 0), self.borderRect, 5)
 
         # Draw Snake
-        for tile in self.snakeTiles:
+        # Use the reversed list to make sure the head is always on top
+        for tile in reversed(self.snakeTiles):
             self.drawImageOnSurface(tile)
 
         # Draw food
@@ -132,8 +133,14 @@ class Snake(Game):
 
         # Check if head is allowed to move on the new field
         if self.isValidField(nextX, nextY):
-            # Update the direction and position of every other element
-            for index in range(len(self.snakeTiles) - 1, 0, -1):
+            # Update the direction and position of every tile except the head
+            # Dont update the new tile and tail if food was eaten
+            startIndex = len(self.snakeTiles) - 1
+            if self.foodEaten:
+                self.foodEaten = False
+                startIndex -= 1
+
+            for index in range(startIndex, 0, -1):
                 # Retrieve direction and position of the previous element
                 prevTile = self.snakeTiles[index - 1]
                 prevDirection = prevTile.getDirection()
@@ -152,7 +159,7 @@ class Snake(Game):
             self.head.setY(nextY)
 
             # Check whether a snake body-tile is at a corner and change the picture if so
-            for index in range(1, len(self.snakeTiles)):
+            for index in range(1, startIndex + 1):
                 prevDirection = self.snakeTiles[index - 1].getDirection()
 
                 tile = self.snakeTiles[index]
@@ -225,13 +232,16 @@ class Snake(Game):
             self.updateFood()
 
             # Add a tile to the snakes body
-            # TODO: Fix bug causing the tail to overlap the body and occasionally be rotated in the wrong direction
             pos = len(self.snakeTiles) - 2
             existingTile = self.snakeTiles[pos]
+
+            # Insert a deepcopy of the existing body AFTER the existing tile
             self.snakeTiles.insert(
-                pos,
+                pos + 1,
                 existingTile.__copy__()
             )
+
+            self.foodEaten = True
 
     def updateFood(self):
         """
