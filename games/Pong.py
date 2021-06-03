@@ -3,6 +3,7 @@ import pygame
 from util import Game, Image
 from config import Configuration
 from random import randint
+import numpy as np
 
 
 class Player(Image):
@@ -31,7 +32,7 @@ class Ball(Image):
         super().__init__(x, y, self.ball_size, "ball.png")
 
         # speed
-        self.speed = (randint(10, 20), randint(5, 10))
+        self.speed = self.getRandomVelocity()
 
         # last velocity flip
         self.last_flip = (x, y)  # is in the middle of the screen when initializing
@@ -65,14 +66,28 @@ class Ball(Image):
             return 1
 
     def reset(self):
-        self.speed = (randint(10, 20), randint(5, 10))
+        self.speed = self.getRandomVelocity()
         self.setX(Configuration.windowWidth / 2)
         self.setY(Configuration.windowHeight / 2)
+
+    def getRandomVelocity(self):
+        v_x, v_y = randint(5, 15), randint(5, 7)
+        pos_or_negativ = np.random.randint(2, size=2)
+
+        if pos_or_negativ[0]:
+            v_x *= -1
+
+        if pos_or_negativ[1]:
+            v_y *= -1
+
+        return v_x, v_y
 
 
 class Pong(Game):
     def __init__(self):
         super().__init__()
+
+        self.font = pygame.font.SysFont(None, 78)
 
         # 2 Players / 1 Player selection Menu
 
@@ -82,19 +97,23 @@ class Pong(Game):
         self.ball = Ball(Configuration.windowWidth / 2, Configuration.windowHeight / 2)
 
         # counter
-        self._counter = (0, 0)
+        self._score = [0, 0]
         self._font = pygame.font.Font('freesansbold.ttf', 32)
 
         # calculate number of spacers
-        number_of_spacers = (Configuration.windowHeight) // 40
+        number_of_spacers = Configuration.windowHeight // 40
         self.spacers = list()
         for i in range(number_of_spacers):
             self.spacers.append(Image(Configuration.windowWidth / 2, 40 * i, (10, 30), "spacer.png"))
 
+        # start the gameloop
         self.run()
 
-    def updateCounter(self):
-        return self._font.render(f"{self._counter[0]}:{self._counter[1]}", True, (255, 255, 255))
+    def updateScore(self, player: int):
+        if player == 1:
+            self._score[0] += 1
+        elif player == 2:
+            self._score[1] += 1
 
     def handleEvent(self, event):
         # event handling
@@ -136,25 +155,28 @@ class Pong(Game):
     def updateGameState(self):
         # borders, movement handling
 
-        # movement update
+        # movement updates
         self.ball.move()
         self.player_one.move()
         self.player_two.move()
 
         # collision handling
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
-            self.ball.flip_velocity(mode="x")
+            self.ball.flip_velocity(mode="x")  # flip velocity vector on x-axis
 
         if self.ball.did_collide_top_bottom():
             self.ball.flip_velocity(mode="y")  # flip velocity vector on y-axis
 
         # determine winner
         winner = self.ball.determine_winner()
-        if winner == 1:
-            # increase player one score
-            self.ball.reset()
-        elif winner == 2:
-            # increase player two score
+        if winner:
+            if winner == 1:
+                # increase player one score
+                self.updateScore(1)
+            elif winner == 2:
+                self.updateScore(2)
+                # increase player two score
+
             self.ball.reset()
 
     def updateScreen(self):
@@ -168,6 +190,10 @@ class Pong(Game):
         for image in self.spacers:
             self.drawImageOnSurface(image)
 
-        self.drawTextOnSurface((255,255,255), "Hi", (0,0))
+        # draw scores
+        self.drawTextOnSurface(self.font, (255, 255, 255), str(self._score[0]),
+                               (Configuration.windowWidth / 4, Configuration.windowHeight / 2))
+        self.drawTextOnSurface(self.font, (255, 255, 255), str(self._score[1]),
+                               (3 * Configuration.windowWidth / 4, Configuration.windowHeight / 2))
 
         super().updateScreen()
