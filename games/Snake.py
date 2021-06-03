@@ -14,9 +14,10 @@ class Snake(Game):
         The objective is to survive as long as possible while eating as much food as possible
 
         This textures of the snake are copied from: https://rembound.com/articles/creating-a-snake-game-tutorial-with-html5
+        Fruits (food) are from Victor Stambert: https://veo_the_artist.artstation.com/projects/oOYoDq
         """
 
-        super().__init__()
+        super().__init__(title=Configuration.windowTitle + " | Snake")
 
         # Calc width and height of the field
         self.width = Configuration.SNAKE_TILES_X * Configuration.SNAKE_TILE_SIZE
@@ -31,13 +32,9 @@ class Snake(Game):
         self.borderRect = pygame.rect.Rect(self.startX, self.startY, self.width, self.height)
 
         # Position the snake in the middle of the field
-        snakeX = self.startX + halfWidth
-        if Configuration.SNAKE_TILES_X % 2 == 1:
-            snakeX += Configuration.SNAKE_TILE_SIZE // 2
-
-        snakeY = self.startY + halfHeight
-        if Configuration.SNAKE_TILES_Y % 2 == 1:
-            snakeY -= Configuration.SNAKE_TILE_SIZE // 2
+        # If width or height is odd add half of a snake tile to stay centered
+        snakeX = self.startX + halfWidth + (Configuration.SNAKE_TILES_X % 2) * Configuration.SNAKE_TILE_SIZE // 2
+        snakeY = self.startY + halfHeight + (Configuration.SNAKE_TILES_Y % 2) * Configuration.SNAKE_TILE_SIZE // 2
 
         # Create the snake tiles: 1 Head, 2 Bodies, 1 Tail
         self.snakeTiles = [
@@ -270,11 +267,12 @@ class Snake(Game):
             newY = random.randrange(self.startY, self.startY + self.height, Configuration.SNAKE_TILE_SIZE)
 
         # Create the food item at the created position
+        # Choose a random image
         self.food = Image(
             x=newX,
             y=newY,
             size=(Configuration.SNAKE_TILE_SIZE, Configuration.SNAKE_TILE_SIZE),
-            image=f"food_{Configuration.SNAKE_FOOD[random.randint(1, 2)]}.png",
+            image=f"food_{Configuration.SNAKE_FOOD[random.randint(0, len(Configuration.SNAKE_FOOD) - 1)]}.png",
             pathToImage="images/Snake"
         )
 
@@ -501,3 +499,6 @@ class SnakeTile(Image):
         """
 
         self.image = pygame.transform.flip(pygame.transform.rotate(self.cornerImage.getImage(), angle), flip, False)
+
+class SnakeHead(SnakeTile):
+    def __init__(self):
