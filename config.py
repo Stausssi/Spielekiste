@@ -16,4 +16,3 @@ class Configuration:
         1: "apple",
         2: "cherry"
     }
-
