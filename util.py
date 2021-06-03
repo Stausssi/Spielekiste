@@ -72,7 +72,7 @@ class Game:
         # Loop through every event
         for event in self.events:
             eventHandled = False
-            
+
             if event.type == pygame.QUIT:
                 self.quit()
                 eventHandled = True
@@ -114,6 +114,26 @@ class Game:
             self.pauseBehaviour()
 
         pygame.display.update()
+
+    def drawTextOnSurface(self, font, color, text, position, surface=None):
+        """
+        This method draws a given text on a surface.
+
+        Args:
+            font (pygame.font.Font):
+            color ((Int,Int,Int)): The color of the drawn text
+            text (String): The text to draw
+            position ((Int ,Int)): The position to draw the text
+
+        Returns: None
+        """
+
+        if surface is None:
+            surface = self.surface
+
+        textSurface = font.render(text, True, color)
+
+        surface.blit(textSurface, position)
 
     def drawImageOnSurface(self, image, position=None, surface=None):
         """
