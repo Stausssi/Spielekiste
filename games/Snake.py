@@ -29,8 +29,9 @@ class Snake(Game):
             hasColorkey=False
         )
 
-        # Initialize background music
-        self.backgroundMusic = None  # "sounds/snake/background.mp3"
+        # Initialize background music and sounds
+        # https://patrickdearteaga.com/royalty-free-music/childs-nightmare/
+        self.backgroundMusic = "sounds/snake/background.ogg"
         self.sounds = {
             # https://mixkit.co/free-sound-effects/eat/ "Chewing something crunchy":
             "food": pygame.mixer.Sound("sounds/snake/food.wav"),
