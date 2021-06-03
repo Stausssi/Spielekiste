@@ -1,8 +1,7 @@
-import os
 import random
-
 import pygame
 from enum import IntEnum
+from threading import Timer
 
 from config import Configuration
 from util import Game, Image
@@ -49,11 +48,11 @@ class Snake(Game):
         ]
 
         self.head = self.snakeTiles[0]
-        # Snake is moving up by default
+
+        # Snake is moving upwards by default
         self.currentDirection = Direction.UP
 
         self.tickCounter = 0
-        self.score = 0
         self.speed = 4
         self.allowMove = True
         self.hasDied = False
@@ -291,6 +290,9 @@ class Snake(Game):
 
         self.isGameOver = True
 
+        # Quit the game and ask for the users name
+        Timer(1, self.quit).start()
+
 
 class Direction(IntEnum):
     """
@@ -390,9 +392,6 @@ class SnakeTile(Image):
 
         self.setRect(rect)
         self.setDirection(direction)
-
-    def setRect(self, rect):
-        super().setRect(rect)
 
     def getPreviousState(self):
         """
