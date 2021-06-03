@@ -10,8 +10,8 @@ class Configuration:
 
     # Snake specific constants
     SNAKE_TILE_SIZE = 50
-    SNAKE_TILES_X = 5
-    SNAKE_TILES_Y = 5
+    SNAKE_TILES_X = 15
+    SNAKE_TILES_Y = 15
     SNAKE_SPEED = 15
     SNAKE_FOOD = ["apple", "cherry", "pear", "strawberry"]
 

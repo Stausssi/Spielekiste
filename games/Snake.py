@@ -32,6 +32,7 @@ class Snake(Game):
         self.borderRect = pygame.rect.Rect(self.startX, self.startY, self.width, self.height)
 
         # Initialize the background image
+        # Image modified after: https://www.slynyrd.com/blog/2019/8/27/pixelblog-20-top-down-tiles
         self.backgroundImage = Image(
             x=0,
             y=0,
