@@ -28,6 +28,16 @@ class Player(Image):
 
         self.move_up = False
         self.move_down = False
+        self.speed = 10
+        self.sensitivity = 20
+
+    def __moveUpIfPossible(self):
+        if self.getY() > 20:
+            self.setY(self.getY() - self.speed)
+
+    def __moveDownIfPossible(self):
+        if self.getY() < (Configuration.windowHeight - 20 - self.player_size[1]):
+            self.setY(self.getY() + self.speed)
 
     def move(self):
         """
@@ -37,36 +47,24 @@ class Player(Image):
         him from exiting the window.
         """
 
-        speed = 10
         if self.move_up:
-            if self.getY() > 20:
-                self.setY(self.getY() - speed)
+            self.__moveUpIfPossible()
         if self.move_down:
-            if self.getY() < (Configuration.windowHeight - 20 - self.player_size[1]):
-                self.setY(self.getY() + speed)
+            self.__moveDownIfPossible()
 
+    def computer_move(self, ball):
+        # after each collision, select a random "sensitivity" where
+        if not abs(ball.getY() - self.getY()) < self.sensitivity and ball.getX() > Configuration.windowWidth / 2:
+            if ball.speed[0] > 0:
+                if ball.getY() < self.getY() + self.SIZE[1] / 2:
+                    self.__moveUpIfPossible()
+                    print("palyer 2 move up")
+                elif ball.getY() > self.getY() + self.SIZE[1] / 2:
+                    self.__moveDownIfPossible()
+                    print("player 2 move down")
 
-class ComputerPlayer(Player):
-    """
-
-    """
-
-    def __init__(self, x, y):
-        super().__init__(x, y)
-
-        if self.ball.speed[0] > 0:
-            print(f"x Speed is{self.ball.speed[0]}")
-            if self.ball.getY() < self.player_two.getY() + self.player_two.SIZE[1]:
-                self.player_two.move_up = True
-                print("palyer 2 move up")
-            elif self.ball.getY() > self.player_two.getY() + self.player_two.SIZE[1]:
-                self.player_two.move_down = True
-                print("player 2 move down")
-
-                if abs(self.ball.getY() - self.player_two.getY()) < 20:
-                    # reset the movement flags of the player
-                    self.player_two.move_up = False
-                    self.player_two.move_down = False
+    def setRandomSensitivity(self):
+        self.sensitivity = randint(0, 100)
 
 
 class Ball(Image):
@@ -82,7 +80,6 @@ class Ball(Image):
 
         # speed
         self.speed = self.getRandomVelocity()
-
 
     def didCollideWithPlayer(self, player: Player):
         """
@@ -197,7 +194,7 @@ class Pong(Game):
     def __init__(self, hasComputerPlayer):
         super().__init__()
 
-        self.hasComputerPlayer = hasComputerPlayer # determines, if player two should be a computer player
+        self.hasComputerPlayer = hasComputerPlayer  # determines, if player two should be a computer player
 
         self.font = pygame.font.SysFont(None, 78)
 
@@ -206,6 +203,7 @@ class Pong(Game):
         # Player Setup
         self.player_one = Player(100, 50)
         self.player_two = Player(Configuration.windowWidth - 100, 50)
+
         self.ball = Ball(Configuration.windowWidth / 2, Configuration.windowHeight / 2)
 
         # counter
@@ -270,7 +268,6 @@ class Pong(Game):
             if event.key == pygame.K_RIGHT:
                 self.player_two.move_down = True
 
-
         # Handle keyup events
         if event.type == pygame.KEYUP:
             # Move up with A Key
@@ -281,15 +278,11 @@ class Pong(Game):
                 self.player_one.move_down = False
 
             # player_two
-            if not self.hasComputerPlayer:
-                if event.key == pygame.K_LEFT:
-                    self.player_two.move_up = False
-                    # Move down with D Key
-                if event.key == pygame.K_RIGHT:
-                    self.player_two.move_down = False
-            else:
-
-
+            if event.key == pygame.K_LEFT:
+                self.player_two.move_up = False
+                # Move down with D Key
+            if event.key == pygame.K_RIGHT:
+                self.player_two.move_down = False
 
     def updateGameState(self) -> None:
         """
@@ -304,11 +297,18 @@ class Pong(Game):
         # movement updates of players and ball
         self.ball.move()
         self.player_one.move()
-        self.player_two.move()
+        if self.hasComputerPlayer:
+            self.player_two.computer_move(self.ball)
+        else:
+            self.player_two.move()
 
         # collision handling
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
             self.ball.flip_velocity(mode="x")  # flip velocity vector on x-axis
+
+            # change the sensitivity of the computer player every bounce to make the game more interesting
+            if self.hasComputerPlayer:
+                self.player_two.setRandomSensitivity()
 
         if self.ball.did_collide_top_bottom():
             self.ball.flip_velocity(mode="y")  # flip velocity vector on y-axis
