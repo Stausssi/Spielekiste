@@ -283,15 +283,21 @@ class Pong(Game):
         if self.ball.did_collide_top_bottom():
             self.ball.flip_velocity(mode="y")  # flip velocity vector on y-axis
 
-        # determine winner
+        # determine winner of the round
         winner = self.ball.determine_winner()
         if winner:
             if winner == 1:
                 # increase player one score
                 self.updateScore(1)
+                # determine, if the player has won
+                if self._score[0] == 5:
+                    print("Player one has won!")
             elif winner == 2:
-                self.updateScore(2)
                 # increase player two score
+                self.updateScore(2)
+                # determine, if the player has won
+                if self._score[1] == 5:
+                    print("Player two has won!")
 
             self.ball.reset()
 
@@ -299,6 +305,9 @@ class Pong(Game):
         """
         This method updates the pygame window by drawing object. Here it draws the ball and the player,
         as well as the spacers in the middle of the game and the score counters
+
+        Return:
+            None
         """
         # fill game display black
         self.surface.fill((0, 0, 0))
@@ -316,4 +325,4 @@ class Pong(Game):
         self.drawTextOnSurface(self.font, (255, 255, 255), str(self._score[1]),
                                (3 * Configuration.windowWidth / 4, Configuration.windowHeight / 2))
 
-        super().updateScreen()
+        super().updateScreen() # call the parent method to update the screen
