@@ -54,6 +54,8 @@ class Game:
 
         # Create variables needed for the game end screen
         self.score = 0
+        self.gameOverText = ""  # has to be set by the specific game
+        self.endFont = pygame.font.SysFont(None, 60)
         self.nameSubmit = False
         self.nameInputX, self.nameInputY = (Configuration.windowWidth // 2, Configuration.windowHeight // 2)
         self.nameBackground = Image(
@@ -158,7 +160,7 @@ class Game:
 
         pygame.display.update()
 
-    def drawTextOnSurface(self, font, color, text, position, surface=None):
+    def drawTextOnSurface(self, font, color, text, position, surface=None, center=True):
         """
         This method draws a given text on a surface.
 
@@ -166,7 +168,10 @@ class Game:
             font (pygame.font.Font):
             color ((Int,Int,Int)): The color of the drawn text
             text (String): The text to draw
-            position ((Int ,Int)): The position to draw the text
+            position ((Int ,Int)): The position of the top left corner of the text
+            surface (pygame.surface.Surface): The surface to draw the text on. Defaults to the default surface of the
+                class
+            center (Boolean): When True, center of the text is moved to position, defaults to True
 
         Returns: None
         """
@@ -175,6 +180,10 @@ class Game:
             surface = self.surface
 
         textSurface = font.render(text, True, color)
+
+        if center:
+            textRect = textSurface.get_rect()
+            position = (position[0] - textRect.width / 2, position[1] - textRect.height / 2)
 
         surface.blit(textSurface, position)
 
@@ -248,6 +257,7 @@ class Game:
         # Ask the user for their name to save the score
         name = self.getUserName()
         self.saveScore(name)
+        self.gameOverText = ""  # clear gameover text
 
     def getUserName(self) -> str:
         """
@@ -266,6 +276,8 @@ class Game:
 
             self.drawImageOnSurface(self.nameBackground)
             self.surface.blit(nameInput.get_surface(), (self.nameInputX, self.nameInputY))
+            self.drawTextOnSurface(self.endFont, (0, 0, 0), self.gameOverText,
+                                   (Configuration.windowWidth / 2, Configuration.windowHeight * 1 / 3))
 
             pygame.display.update()
 
@@ -285,6 +297,17 @@ class Game:
 
         # print(self.score, name)
         pass
+
+    def setGameOverText(self, text: str):
+        """
+        This function generates a gameover text when a player has won or lost that will be displayed on the endscreen.
+        It internally sets the attribute gameOverText.
+
+        Args:
+            text (str): the text that will be displayed on the endscreen
+        """
+
+        self.gameOverText = text
 
     def quit(self):
         """

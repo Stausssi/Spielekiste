@@ -292,12 +292,21 @@ class Pong(Game):
                 # determine, if the player has won
                 if self._score[0] == 5:
                     print("Player one has won!")
+                    # generate gameover text
+                    self.setGameOverText(f"Player 1 has won! Score:1000")
+                    self.isGameOver = True
+                    self.isRunning = False
+
             elif winner == 2:
                 # increase player two score
                 self.updateScore(2)
                 # determine, if the player has won
                 if self._score[1] == 5:
                     print("Player two has won!")
+                    # generate gameover text
+                    self.setGameOverText(f"Player 2 has won! Score:1000")
+                    self.isGameOver = True
+                    self.isRunning = False
 
             self.ball.reset()
 
@@ -325,4 +334,4 @@ class Pong(Game):
         self.drawTextOnSurface(self.font, (255, 255, 255), str(self._score[1]),
                                (3 * Configuration.windowWidth / 4, Configuration.windowHeight / 2))
 
-        super().updateScreen() # call the parent method to update the screen
+        super().updateScreen()  # call the parent method to update the screen
