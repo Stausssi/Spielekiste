@@ -5,4 +5,5 @@ class Configuration:
 
     windowWidth, windowHeight = 1920, 1080
     windowSize = (windowWidth, windowHeight)
-
+    windowTitle = "Niklas und Simons Spielekiste"
+    FRAMERATE = 60
