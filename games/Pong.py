@@ -46,6 +46,29 @@ class Player(Image):
                 self.setY(self.getY() + speed)
 
 
+class ComputerPlayer(Player):
+    """
+
+    """
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
+
+        if self.ball.speed[0] > 0:
+            print(f"x Speed is{self.ball.speed[0]}")
+            if self.ball.getY() < self.player_two.getY() + self.player_two.SIZE[1]:
+                self.player_two.move_up = True
+                print("palyer 2 move up")
+            elif self.ball.getY() > self.player_two.getY() + self.player_two.SIZE[1]:
+                self.player_two.move_down = True
+                print("player 2 move down")
+
+                if abs(self.ball.getY() - self.player_two.getY()) < 20:
+                    # reset the movement flags of the player
+                    self.player_two.move_up = False
+                    self.player_two.move_down = False
+
+
 class Ball(Image):
     """
     This class is a child class of the Image class. It represents the pong ball.
@@ -60,8 +83,6 @@ class Ball(Image):
         # speed
         self.speed = self.getRandomVelocity()
 
-        # last velocity flip
-        self.last_flip = (x, y)  # is in the middle of the screen when initializing
 
     def didCollideWithPlayer(self, player: Player):
         """
@@ -120,7 +141,7 @@ class Ball(Image):
 
     def determine_winner(self):
         """
-        Determines, if a player has won the game. If the ball moves out of the vertical boundary of the window,
+        Determines, if a player has won a round. If the ball moves out of the vertical boundary of the window,
         the player on the opposite side scores a goal.
 
         Return:
@@ -173,8 +194,10 @@ class Pong(Game):
     creates the score counters and handles the general screen updates.
     """
 
-    def __init__(self):
+    def __init__(self, hasComputerPlayer):
         super().__init__()
+
+        self.hasComputerPlayer = hasComputerPlayer # determines, if player two should be a computer player
 
         self.font = pygame.font.SysFont(None, 78)
 
@@ -188,7 +211,7 @@ class Pong(Game):
         # counter
         self._score = [0, 0]
         self._font = pygame.font.Font('freesansbold.ttf', 32)
-        self.startTime = time() # time of the game start
+        self.startTime = time()  # time of the game start --> is used to calculate a score
 
         # calculate the number of spacers by windowheight
         number_of_spacers = Configuration.windowHeight // 40
@@ -247,6 +270,7 @@ class Pong(Game):
             if event.key == pygame.K_RIGHT:
                 self.player_two.move_down = True
 
+
         # Handle keyup events
         if event.type == pygame.KEYUP:
             # Move up with A Key
@@ -257,11 +281,15 @@ class Pong(Game):
                 self.player_one.move_down = False
 
             # player_two
-            if event.key == pygame.K_LEFT:
-                self.player_two.move_up = False
-                # Move down with D Key
-            if event.key == pygame.K_RIGHT:
-                self.player_two.move_down = False
+            if not self.hasComputerPlayer:
+                if event.key == pygame.K_LEFT:
+                    self.player_two.move_up = False
+                    # Move down with D Key
+                if event.key == pygame.K_RIGHT:
+                    self.player_two.move_down = False
+            else:
+
+
 
     def updateGameState(self) -> None:
         """
@@ -273,7 +301,7 @@ class Pong(Game):
         """
 
         # borders, movement handling
-        # movement updates
+        # movement updates of players and ball
         self.ball.move()
         self.player_one.move()
         self.player_two.move()
@@ -289,13 +317,14 @@ class Pong(Game):
         winner = self.ball.determine_winner()
         if winner:
 
+            # calculate the score of the player based on the time it took to win
             endTime = time()
-            score = int(10000 // (endTime - self.startTime)) # the faster a player wins, the more points he gets
+            score = int(10000 // (endTime - self.startTime))  # the faster a player wins, the more points he gets
 
             if winner == 1:
                 # increase player one score
                 self.updateScore(1)
-                # determine, if the player has won
+                # determine, if the player has won 5 rounds
                 if self._score[0] == 5:
                     # TODO -->  exchange for log
                     print("Player one has won!")
@@ -307,7 +336,7 @@ class Pong(Game):
             elif winner == 2:
                 # increase player two score
                 self.updateScore(2)
-                # determine, if the player has won
+                # determine, if the player has won 5 rounds
                 if self._score[1] == 5:
                     # TODO -->  exchange for log
                     print("Player two has won!")
@@ -316,7 +345,7 @@ class Pong(Game):
                     self.isGameOver = True
                     self.isRunning = False
 
-            self.ball.reset()
+            self.ball.reset()  # reset the velocity and position of the ball
 
     def updateScreen(self):
         """

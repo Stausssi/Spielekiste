@@ -355,6 +355,12 @@ class GameContainer(Game):
             height=self.windowSize[1],
             theme=pygame_menu.themes.THEME_DARK
         )
+        self.pongMenu = pygame_menu.Menu(
+            title="Number of players",
+            width=self.windowSize[0],
+            height=self.windowSize[1],
+            theme=pygame_menu.themes.THEME_DARK
+        )
 
         # Add buttons to main menu
         self.mainMenu.add.button("Play", self.playMenu)
@@ -365,7 +371,7 @@ class GameContainer(Game):
         # Add games to play menu
         self.playMenu.add.button("Play Snake", self.startSnake)
         self.playMenu.add.button("Play Tic Tac Toe", self.startTTT)
-        self.playMenu.add.button("Play Pong", self.startPong)
+        self.playMenu.add.button("Play Pong", self.pongMenu)
         self.playMenu.add.button("Play Space-Invader", self.startSpaceInvader)
         self.playMenu.add.button("Back", pygame_menu.events.BACK)
 
@@ -374,6 +380,11 @@ class GameContainer(Game):
 
         # Add buttons to highscore menu
         self.highscoreMenu.add.button("Back", pygame_menu.events.BACK)
+
+        # Add buttons to pong menu
+        self.pongMenu.add.button("Two players", self.startPong)
+        self.pongMenu.add.button("One player", self.startPong)
+        self.pongMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Quit the game on esc
         self.pauseBehaviour = self.quit
@@ -412,7 +423,7 @@ class GameContainer(Game):
         """
 
         from games.Pong import Pong
-        Pong()
+        Pong(True)
 
     @staticmethod
     def startSpaceInvader():
