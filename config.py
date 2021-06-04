@@ -9,6 +9,14 @@ class Configuration:
     MUSIC_VOLUME = 0.3
     FRAMERATE = 60
 
+    # Scores
+    SCORES_HEADER = {
+        "Snake": ["Score"],
+        "TicTacToe": ["Wins"],
+        "Pong": ["Wins", "Score"],
+        "Space Invaders": ["Score"]
+    }
+
 
 class Colors:
     White = (255, 255, 255)
