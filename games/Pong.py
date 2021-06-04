@@ -180,7 +180,7 @@ class Ball(Image):
         Return:
             None
         """
-        
+
         new_x = self.getX() + self.speed[0]
         new_y = self.getY() + self.speed[1]
         self.setX(new_x)
@@ -276,7 +276,7 @@ class Pong(Game):
 
     def preGameScreen(self) -> None:
         """
-        This function loads the pregame animation.
+        This function loads the pregame animation and renders it on the screen.
 
         Return:
             None
