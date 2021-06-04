@@ -28,23 +28,44 @@ class Player(Image):
 
         self.move_up = False
         self.move_down = False
+
+        # the speed in which the player is moved with
         self.speed = 10
+
+        # determines, how accurate the computer player tracks the ball
         self.sensitivity = 20
 
-    def __moveUpIfPossible(self):
+    def __moveUpIfPossible(self) -> None:
+        """
+        This function moves the player up, if move_up is set and he doesn´t leave the window
+
+        Returns:
+            None
+        """
+
         if self.getY() > 20:
             self.setY(self.getY() - self.speed)
 
     def __moveDownIfPossible(self):
+        """
+        This function moves the player down, if move_down is set and he doesn´t leave the window
+
+        Returns:
+            None
+        """
+
         if self.getY() < (Configuration.windowHeight - 20 - self.player_size[1]):
             self.setY(self.getY() + self.speed)
 
-    def move(self):
+    def move(self) -> None:
         """
         This function handles the movement of the player.
         When move_up or move_down is set, the Y- coordinate of the player is adjusted in either direction.
         The movement is not updated, if the player comes close to the boundaries of the window to prevent
-        him from exiting the window.
+        him from exiting the window, this is handles by the functions __moveUpIfPossible() and __moveDownIfPossible()
+
+        Returns:
+            None
         """
 
         if self.move_up:
@@ -52,19 +73,41 @@ class Player(Image):
         if self.move_down:
             self.__moveDownIfPossible()
 
-    def computer_move(self, ball):
-        # after each collision, select a random "sensitivity" where
-        if not abs(ball.getY() - self.getY()) < self.sensitivity and ball.getX() > Configuration.windowWidth / 2:
-            if ball.speed[0] > 0:
-                if ball.getY() < self.getY() + self.SIZE[1] / 2:
-                    self.__moveUpIfPossible()
-                    print("palyer 2 move up")
-                elif ball.getY() > self.getY() + self.SIZE[1] / 2:
-                    self.__moveDownIfPossible()
-                    print("player 2 move down")
+    def computer_move(self, ball) -> None:
+        """
+        This function handles the movement of a computer player.
+        It moves the computer player in the direction of the ball, if certain criteria are met.
+        Furthermore, it makes the computer player easier to win against by introducing a some
+        errors, or by reducing it´s speed.
 
-    def setRandomSensitivity(self):
-        self.sensitivity = randint(0, 100)
+        Args:
+            ball (Ball): the ball that the player should move to
+
+        Returns:
+            None
+        """
+
+        # only move the computer player, when the ball is moving in it´s direction,
+        # it´s y coordinate is more than "sensitivity" - pixels away from the ball
+        # and when the ball is the right half of the window
+
+        if ball.speed[0] > 0 and not abs(
+                ball.getY() - self.getY()) < self.sensitivity and ball.getX() > Configuration.windowWidth / 2:
+            if ball.getY() < self.getY() + self.SIZE[1] / 2:
+                self.__moveUpIfPossible()
+            elif ball.getY() > self.getY() + self.SIZE[1] / 2:
+                self.__moveDownIfPossible()
+
+    def setRandomSensitivitySpeed(self) -> None:
+        """
+        This function sets a random speed an sensitivity for the player.
+
+        Returns:
+            None
+        """
+
+        self.sensitivity = randint(30, 90)
+        self.speed = randint(6, 12)
 
 
 class Ball(Image):
@@ -164,7 +207,7 @@ class Ball(Image):
         self.setX(Configuration.windowWidth / 2)
         self.setY(Configuration.windowHeight / 2)
 
-    def getRandomVelocity(self):
+    def getRandomVelocity(self) -> (int, int):
         """
         Generates a random velocity tuple, that has random x/y values and signs.
 
@@ -173,7 +216,7 @@ class Ball(Image):
         """
 
         v_x, v_y = randint(5, 15), randint(5, 7)
-        pos_or_negativ = np.random.randint(2, size=2)
+        pos_or_negativ = np.random.randint(2, size=2)  # 1 --> negative sign, 0 --> positive sign
 
         if pos_or_negativ[0]:
             v_x *= -1
@@ -221,7 +264,7 @@ class Pong(Game):
         # start the gameloop
         self.run()
 
-    def updateScore(self, player: int):
+    def updateScore(self, player: int) -> None:
         """
         This function updates the score counter and increase the points of one player.
 
@@ -262,11 +305,12 @@ class Pong(Game):
                 self.player_one.move_down = True
 
             # player_two
-            if event.key == pygame.K_LEFT:
-                self.player_two.move_up = True
-                # Move down with D Key
-            if event.key == pygame.K_RIGHT:
-                self.player_two.move_down = True
+            if not self.hasComputerPlayer:
+                if event.key == pygame.K_LEFT:
+                    self.player_two.move_up = True
+                    # Move down with D Key
+                if event.key == pygame.K_RIGHT:
+                    self.player_two.move_down = True
 
         # Handle keyup events
         if event.type == pygame.KEYUP:
@@ -278,11 +322,12 @@ class Pong(Game):
                 self.player_one.move_down = False
 
             # player_two
-            if event.key == pygame.K_LEFT:
-                self.player_two.move_up = False
-                # Move down with D Key
-            if event.key == pygame.K_RIGHT:
-                self.player_two.move_down = False
+            if not self.hasComputerPlayer:
+                if event.key == pygame.K_LEFT:
+                    self.player_two.move_up = False
+                    # Move down with D Key
+                if event.key == pygame.K_RIGHT:
+                    self.player_two.move_down = False
 
     def updateGameState(self) -> None:
         """
@@ -293,7 +338,6 @@ class Pong(Game):
             None
         """
 
-        # borders, movement handling
         # movement updates of players and ball
         self.ball.move()
         self.player_one.move()
@@ -306,9 +350,9 @@ class Pong(Game):
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
             self.ball.flip_velocity(mode="x")  # flip velocity vector on x-axis
 
-            # change the sensitivity of the computer player every bounce to make the game more interesting
+            # change the sensitivity and speed of the computer player every bounce to make the game more interesting
             if self.hasComputerPlayer:
-                self.player_two.setRandomSensitivity()
+                self.player_two.setRandomSensitivitySpeed()
 
         if self.ball.did_collide_top_bottom():
             self.ball.flip_velocity(mode="y")  # flip velocity vector on y-axis

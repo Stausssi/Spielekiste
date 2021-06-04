@@ -382,8 +382,8 @@ class GameContainer(Game):
         self.highscoreMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to pong menu
-        self.pongMenu.add.button("Two players", self.startPong)
-        self.pongMenu.add.button("One player", self.startPong)
+        self.pongMenu.add.button("Two players", self.startPongMultiplayer)
+        self.pongMenu.add.button("One player", self.startPongComputer)
         self.pongMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Quit the game on esc
@@ -417,9 +417,18 @@ class GameContainer(Game):
         TicTacToe()
 
     @staticmethod
-    def startPong():
+    def startPongMultiplayer():
         """
-        This functions starts the Pong-Game
+        This functions starts the Pong-Game with two players
+        """
+
+        from games.Pong import Pong
+        Pong(False)
+
+    @staticmethod
+    def startPongComputer():
+        """
+        This functions starts the Pong-Game with a computer player
         """
 
         from games.Pong import Pong
