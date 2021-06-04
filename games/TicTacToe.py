@@ -66,6 +66,7 @@ class TicTacToe(Game):
                 self.fields.update({
                     self.indexFromXY(x, y): TTTTile(posX, posY)
                 })
+        self.backgroundMusic = None
 
         # Save all possibilities a player can win with
         self.winPossibilities = [
