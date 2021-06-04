@@ -340,6 +340,9 @@ class GameContainer(Game):
         """
         super().__init__()
 
+        # Disable the score display
+        self.hasScore = False
+        
         # Create menus
         # https://pygame-menu.readthedocs.io/en/4.0.1/index.html
         self.mainMenu = pygame_menu.Menu(
