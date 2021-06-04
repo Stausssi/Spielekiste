@@ -9,6 +9,7 @@ from config import Configuration
 from random import randint
 import numpy as np
 from time import time
+from time import sleep
 
 
 class Player(Image):
@@ -263,6 +264,34 @@ class Pong(Game):
         for i in range(number_of_spacers):
             # image was edited on my own
             self.spacers.append(Image(Configuration.windowWidth / 2, 40 * i, (10, 30), "spacer.png"))
+
+        # render the pregame animation screen
+
+        # load all images
+        # created with: https://de.flamingtext.com/Free-Logo-Designs/
+        logo = Image(Configuration.windowWidth / 2 - 750 / 2, Configuration.windowHeight / 4 - 120 / 2, (750, 120),
+                     "PongLogo.png")
+        keys_player_one = Image(Configuration.windowWidth / 4 - 150, Configuration.windowHeight * 3 / 4 - 50,
+                                (300, 100),
+                                "AandD.png")
+        keys_player_two = Image(Configuration.windowWidth * 3 / 4 - 150, Configuration.windowHeight * 3 / 4 - 50,
+                                (300, 100),
+                                "ArrowLeftRight.png")
+
+        # draw text and images
+        self.surface.fill((0, 0, 0))
+        self.drawImageOnSurface(logo)
+        self.drawImageOnSurface(keys_player_one)
+        if not hasComputerPlayer:
+            self.drawImageOnSurface(keys_player_two)
+        self.drawTextOnSurface(self.font, (11, 162, 12), "First player that reaches 1001 points wins!",
+                               (Configuration.windowWidth / 2, Configuration.windowHeight / 2))
+
+        self.drawTextOnSurface(self.font, (11, 162, 12), "Controls",
+                               (Configuration.windowWidth / 2, Configuration.windowHeight *3 / 4))
+
+        super().updateScreen()  # display images on screen
+        sleep(4)
 
         # start the gameloop
         self.run()
