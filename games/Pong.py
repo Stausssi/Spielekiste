@@ -105,6 +105,7 @@ class Player(Image):
     def setRandomSensitivitySpeed(self) -> None:
         """
         This function sets a random speed and sensitivity for the player.
+        This is used, so that the computer player can have some inaccuracies and lose the game easier.
 
         Returns:
             None
@@ -174,11 +175,12 @@ class Ball(Image):
 
     def move(self):
         """
-        This function moves the ball by it's speed vector.
+        This function moves the ball in the direction of it's speed vector.
 
         Return:
             None
         """
+        
         new_x = self.getX() + self.speed[0]
         new_y = self.getY() + self.speed[1]
         self.setX(new_x)
