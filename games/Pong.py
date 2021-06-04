@@ -21,6 +21,9 @@ class Player(Image):
 
     def __init__(self, x, y):
         self.player_size = (20, 150)
+
+        # image from: https://www.bienenfisch-design.de/produkt/bits-and-bytes/
+        # and edited
         super().__init__(x, y, self.player_size, "plane.png")
 
         # movement flags --> These determine in which direction the player is moved,
@@ -119,7 +122,8 @@ class Ball(Image):
 
     def __init__(self, x, y):
         self.ball_size = (30, 30)
-        super().__init__(x, y, self.ball_size, "ball.png")
+        # image was edited on my own
+        super().__init__(x, y, self.ball_size, "ballbyte.png")
 
         # speed
         self.speed = self.getRandomVelocity()
@@ -257,6 +261,7 @@ class Pong(Game):
         # create an Array of Image objects to be displayed on the screen
         self.spacers = list()
         for i in range(number_of_spacers):
+            # image was edited on my own
             self.spacers.append(Image(Configuration.windowWidth / 2, 40 * i, (10, 30), "spacer.png"))
 
         # start the gameloop
@@ -409,9 +414,9 @@ class Pong(Game):
             self.drawImageOnSurface(image)
 
         # draw scores
-        self.drawTextOnSurface(self.font, (255, 255, 255), str(self._score[0]),
+        self.drawTextOnSurface(self.font, (11, 162, 12), format(self._score[0], "04b"),
                                (Configuration.windowWidth / 4, Configuration.windowHeight / 2))
-        self.drawTextOnSurface(self.font, (255, 255, 255), str(self._score[1]),
+        self.drawTextOnSurface(self.font, (11, 162, 12), format(self._score[1], "04b"),
                                (3 * Configuration.windowWidth / 4, Configuration.windowHeight / 2))
 
         super().updateScreen()  # call the parent method to update the screen
