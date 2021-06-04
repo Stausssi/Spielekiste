@@ -8,6 +8,7 @@ from util import Game, Image
 from config import Configuration
 from random import randint
 import numpy as np
+from time import time
 
 
 class Player(Image):
@@ -187,6 +188,7 @@ class Pong(Game):
         # counter
         self._score = [0, 0]
         self._font = pygame.font.Font('freesansbold.ttf', 32)
+        self.startTime = time() # time of the game start
 
         # calculate the number of spacers by windowheight
         number_of_spacers = Configuration.windowHeight // 40
@@ -286,14 +288,19 @@ class Pong(Game):
         # determine winner of the round
         winner = self.ball.determine_winner()
         if winner:
+
+            endTime = time()
+            score = int(10000 // (endTime - self.startTime)) # the faster a player wins, the more points he gets
+
             if winner == 1:
                 # increase player one score
                 self.updateScore(1)
                 # determine, if the player has won
                 if self._score[0] == 5:
+                    # TODO -->  exchange for log
                     print("Player one has won!")
                     # generate gameover text
-                    self.setGameOverText(f"Player 1 has won! Score:1000")
+                    self.setGameOverText(f"Player 1 has won! Score: {score}")
                     self.isGameOver = True
                     self.isRunning = False
 
@@ -302,9 +309,10 @@ class Pong(Game):
                 self.updateScore(2)
                 # determine, if the player has won
                 if self._score[1] == 5:
+                    # TODO -->  exchange for log
                     print("Player two has won!")
                     # generate gameover text
-                    self.setGameOverText(f"Player 2 has won! Score:1000")
+                    self.setGameOverText(f"Player 2 has won! Score: {score}")
                     self.isGameOver = True
                     self.isRunning = False
 
