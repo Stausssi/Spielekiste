@@ -22,3 +22,5 @@ class Colors:
     VeryLightGreen = (0, 255, 0)
     LightGreen = (0, 200, 0)
     Green = (0, 150, 0)
+    Red = (255, 0, 0)
+    DarkRed = (150, 0, 0)

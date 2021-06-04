@@ -29,7 +29,16 @@ class Snake(Game):
         # Calculate the upper left corner of the game field
         self.startX = Configuration.windowWidth // 2 - halfWidth
         self.startY = Configuration.windowHeight // 2 - halfHeight
-        self.borderRect = pygame.rect.Rect(self.startX, self.startY, self.width, self.height)
+
+        # Create the border around the field
+        self.borderThickness = 6
+        halfThickness = self.borderThickness // 2
+        self.borderRect = pygame.rect.Rect(
+            self.startX - halfThickness,
+            self.startY - halfThickness,
+            self.width + self.borderThickness,
+            self.height + self.borderThickness
+        )
 
         # Initialize the background image
         # Image modified after: https://www.slynyrd.com/blog/2019/8/27/pixelblog-20-top-down-tiles
@@ -112,7 +121,7 @@ class Snake(Game):
                 pygame.draw.rect(self.surface, color, (x, y, size, size))
 
         # Draw border
-        pygame.draw.rect(self.surface, (255, 0, 0), self.borderRect, 5)
+        pygame.draw.rect(self.surface, Colors.Red, self.borderRect, self.borderThickness)
 
         # Draw Snake
         # Use the reversed list to make sure the head is always on top
