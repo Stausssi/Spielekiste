@@ -66,7 +66,6 @@ class TicTacToe(Game):
                 self.fields.update({
                     self.indexFromXY(x, y): TTTTile(posX, posY)
                 })
-        self.backgroundMusic = None
 
         # Save all possibilities a player can win with
         self.winPossibilities = [
@@ -84,31 +83,30 @@ class TicTacToe(Game):
         self.run()
 
     def updateScreen(self):
-        # Draw fields
-        for x in range(3):
-            for y in range(3):
-                size = Configuration.TTT_TILE_SIZE
-                xPos = self.startX + x * size
-                yPos = self.startY + y * size
+        # Draw white background
+        pygame.draw.rect(
+            self.surface,
+            Colors.White,
+            (self.startX, self.startY, 3 * Configuration.TTT_TILE_SIZE, 3 * Configuration.TTT_TILE_SIZE)
+        )
 
-                # Draw white field
-                pygame.draw.rect(
-                    self.surface,
-                    Colors.White,
-                    (xPos, yPos, size, size)
-                )
-
-                # Draw black field border
-                pygame.draw.rect(
-                    self.surface,
-                    Colors.Black,
-                    (xPos, yPos, size, size),
-                    4
-                )
-
-        # Draw X and Os
+        # Draw symbols and borders
         for field in self.fields.values():
-            self.drawTextOnSurface(field.getPlayer(), field.getPos(), Colors.Black, font=self.symbolFont)
+            fieldPos = field.getPos()
+
+            # Draw the border around the field
+            borderX, borderY = fieldPos
+            borderX -= Configuration.TTT_TILE_SIZE // 2
+            borderY -= Configuration.TTT_TILE_SIZE // 2
+            pygame.draw.rect(
+                self.surface,
+                Colors.Black,
+                (borderX, borderY, Configuration.TTT_TILE_SIZE, Configuration.TTT_TILE_SIZE),
+                4
+            )
+
+            # Draw the symbol
+            self.drawTextOnSurface(field.getPlayer(), fieldPos, Colors.Black, font=self.symbolFont)
 
         # Notify users of a draw or the winner
         if self.draw:
@@ -142,23 +140,24 @@ class TicTacToe(Game):
         self.currentPlayer = self.players[self.turns % 2]
 
     def handleEvent(self, event):
-        # Mouse left click
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            # Get the field the player clicked on
-            posX = event.pos[0]
-            posY = event.pos[1]
-            fieldX = int((posX - self.startX) // Configuration.TTT_TILE_SIZE)
-            fieldY = int((posY - self.startY) // Configuration.TTT_TILE_SIZE)
+        if not self.isGameOver:
+            # Mouse left click
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Get the field the player clicked on
+                posX = event.pos[0]
+                posY = event.pos[1]
+                fieldX = int((posX - self.startX) // Configuration.TTT_TILE_SIZE)
+                fieldY = int((posY - self.startY) // Configuration.TTT_TILE_SIZE)
 
-            # Check if field is valid
-            if fieldX in range(3) and fieldY in range(3):
-                # Update the field and turn count
-                if self.fields[self.indexFromXY(fieldX, fieldY)].setPlayer(self.currentPlayer):
-                    self.playSound("click")
-                    self.turns += 1
-        # Display the current player at the position of the mouse
-        elif event.type == pygame.MOUSEMOTION:
-            self.mousePos = event.pos
+                # Check if field is valid
+                if fieldX in range(3) and fieldY in range(3):
+                    # Update the field and turn count
+                    if self.fields[self.indexFromXY(fieldX, fieldY)].setPlayer(self.currentPlayer):
+                        self.playSound("click")
+                        self.turns += 1
+            # Display the current player at the position of the mouse
+            elif event.type == pygame.MOUSEMOTION:
+                self.mousePos = event.pos
 
     def gameStateNotification(self, text, isDraw=False):
         """
@@ -209,6 +208,15 @@ class TicTacToe(Game):
 
 class TTTTile:
     def __init__(self, x, y):
+        """
+        This class represents a TicTacToeTile.
+        It contains the position of the tile and the player occupying it.
+
+        Args:
+            x (int): The x coordinate of the center of the tile
+            y (int): The y coordinate of the center of the tile
+        """
+
         self.x = x
         self.y = y
         self.player = ""
