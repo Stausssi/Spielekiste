@@ -1,5 +1,5 @@
 """
-This File contains the classes Player, Ball, and the main class Pong, which is used to start  the pong game
+This File contains the classes Player, Ball, and the main class Pong, which is used to start the pong game
 """
 
 import pygame
@@ -100,7 +100,7 @@ class Player(Image):
 
     def setRandomSensitivitySpeed(self) -> None:
         """
-        This function sets a random speed an sensitivity for the player.
+        This function sets a random speed and sensitivity for the player.
 
         Returns:
             None
@@ -239,9 +239,7 @@ class Pong(Game):
 
         self.hasComputerPlayer = hasComputerPlayer  # determines, if player two should be a computer player
 
-        self.font = pygame.font.SysFont(None, 78)
-
-        # 2 Players / 1 Player selection Menu
+        self.font = pygame.font.SysFont(None, 78)  # initialize the font
 
         # Player Setup
         self.player_one = Player(100, 50)
@@ -399,6 +397,7 @@ class Pong(Game):
         Return:
             None
         """
+
         # fill game display black
         self.surface.fill((0, 0, 0))
 
