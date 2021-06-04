@@ -6,6 +6,7 @@ class Configuration:
     windowWidth, windowHeight = 1920, 1080
     windowSize = (windowWidth, windowHeight)
     windowTitle = "Niklas und Simons Spielekiste"
+    MUSIC_VOLUME = 0.3
     FRAMERATE = 60
 
     # Snake specific constants

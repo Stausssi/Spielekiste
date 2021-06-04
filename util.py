@@ -22,6 +22,10 @@ class Game:
         self.isRunning = True
         self.isGameOver = False
         self.isPaused = False
+        self.hasScore = True
+        self.score = 0
+        self.scoreX, self.scoreY = (windowSize[0] // 2, 100)
+
         self.windowSize = windowSize
         self.events = None
 
@@ -50,10 +54,10 @@ class Game:
         self.pauseMenu.add.button("Resume Playing", self.togglePause)
         self.pauseMenu.add.button("Quit", self.quit)
 
+        # Draw the pause menu by default on pause (ESC)
         self.pauseBehaviour = self.drawMenu
 
         # Create variables needed for the game end screen
-        self.score = 0
         self.nameSubmit = False
         self.nameInputX, self.nameInputY = (Configuration.windowWidth // 2, Configuration.windowHeight // 2)
         self.nameBackground = Image(
@@ -71,11 +75,14 @@ class Game:
         If self.isRunning is False, self.gameOver() will be called to ask the user for their name.
         
         !DO NOT OVERWRITE THIS METHOD!
+
+        Returns: None
         """
 
         # Play background music
         if self.backgroundMusic is not None:
             pygame.mixer.music.load(self.backgroundMusic)
+            pygame.mixer.music.set_volume(Configuration.MUSIC_VOLUME)
             pygame.mixer.music.play(-1)
 
         # Main loop
@@ -93,7 +100,7 @@ class Game:
             # Target 60 FPS
             self.clock.tick(Configuration.FRAMERATE)
 
-        if self.isGameOver:
+        if self.isGameOver and self.hasScore:
             self.gameOver()
 
     def updateEvents(self, nameInput=False):
@@ -139,6 +146,8 @@ class Game:
 
         Args:
             event (pygame.event.Event): The to be handled event
+
+        Returns: None
         """
 
         # print("Unhandled event:", event)
@@ -147,6 +156,8 @@ class Game:
     def updateGameState(self):
         """
         This method handles all game-specific state changes. It is to be implemented by the children classes.
+
+        Returns: None
         """
 
         pass
@@ -159,6 +170,11 @@ class Game:
 
         if self.isPaused:
             self.pauseBehaviour()
+
+        if self.hasScore:
+            # Print score at a given position
+            # self.drawTextOnSurface(f"Score: {self.score}", self.scoreX, self.scoreY)
+            pass
 
         pygame.display.update()
 
@@ -202,23 +218,27 @@ class Game:
 
     def togglePause(self):
         """
-        This method toggles self.isPaused and is called once the user pressed the ESC-key
+        This method toggles self.isPaused and is called once the user pressed the ESC-key.
+
+        Returns: None
         """
 
         self.isPaused = not self.isPaused
 
-    def playSound(self, sound):
+    def playSound(self, sound, volume=1.0):
         """
         This method plays a sound.
 
         Args:
             sound (str): The name of the sound
+            volume (float): The volume of the sound. Ranges from 0.0 to 1.0, where 1.0 is the loudest
 
         Returns: None
         """
         sound = self.sounds[sound]
 
         if sound:
+            sound.set_volume(volume)
             sound.play()
 
     def gameOver(self):
