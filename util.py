@@ -3,7 +3,7 @@ import pygame
 import pygame_menu
 from pygame_textinput import TextInput
 
-from config import Configuration
+from config import Configuration, Colors
 
 
 class Game:
@@ -43,6 +43,10 @@ class Game:
         pygame.mixer.init()
         self.backgroundMusic = None
         self.sounds = {}
+
+        # Font
+        pygame.font.init()
+        self.defaultFont = pygame.font.SysFont("arial", 25)
 
         # Create the pause menu
         self.pauseMenu = pygame_menu.Menu(
@@ -173,10 +177,39 @@ class Game:
 
         if self.hasScore:
             # Print score at a given position
-            # self.drawTextOnSurface(f"Score: {self.score}", self.scoreX, self.scoreY)
-            pass
+            self.drawTextOnSurface(f"Score: {self.score}", (self.scoreX, self.scoreY))
 
         pygame.display.update()
+
+    def drawTextOnSurface(self, text, position, color=Colors.White, font=None, surface=None, center=True):
+        """
+        This method draws a given text on a surface.
+
+        Args:
+            color (tuple[int, int, int]): The color of the drawn text
+            text (String): The text to draw
+            position ((int, int)): The position of the top left corner of the text
+            font (pygame.font.Font): The font of the text. Defaults to self.defaultFont
+            surface (pygame.surface.Surface): The surface to draw the text on. Defaults to the default surface of the
+                class
+            center (Boolean): When True, center of the text is moved to position, defaults to True
+
+        Returns: None
+        """
+
+        if surface is None:
+            surface = self.surface
+
+        if font is None:
+            font = self.defaultFont
+
+        textSurface = font.render(text, True, color)
+
+        if center:
+            textRect = textSurface.get_rect()
+            position = (position[0] - textRect.width / 2, position[1] - textRect.height / 2)
+
+        surface.blit(textSurface, position)
 
     def drawImageOnSurface(self, image, position=None, surface=None):
         """
@@ -310,6 +343,9 @@ class GameContainer(Game):
         """
         super().__init__()
 
+        # Disable the score display
+        self.hasScore = False
+        
         # Create menus
         # https://pygame-menu.readthedocs.io/en/4.0.1/index.html
         self.mainMenu = pygame_menu.Menu(
