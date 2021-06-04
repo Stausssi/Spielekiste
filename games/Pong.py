@@ -184,7 +184,7 @@ class Ball(Image):
         self.setX(new_x)
         self.setY(new_y)
 
-    def determine_winner(self):
+    def determine_round_winner(self):
         """
         Determines, if a player has won a round. If the ball moves out of the vertical boundary of the window,
         the player on the opposite side scores a goal.
@@ -267,6 +267,19 @@ class Pong(Game):
 
         # render the pregame animation screen
 
+        self.preGameScreen()
+
+        # start the gameloop
+        self.run()
+
+    def preGameScreen(self) -> None:
+        """
+        This function loads the pregame animation.
+
+        Return:
+            None
+        """
+
         # load all images
         # created with: https://de.flamingtext.com/Free-Logo-Designs/
         logo = Image(Configuration.windowWidth / 2 - 750 / 2, Configuration.windowHeight / 4 - 120 / 2, (750, 120),
@@ -282,19 +295,16 @@ class Pong(Game):
         self.surface.fill((0, 0, 0))
         self.drawImageOnSurface(logo)
         self.drawImageOnSurface(keys_player_one)
-        if not hasComputerPlayer:
+        if not self.hasComputerPlayer:
             self.drawImageOnSurface(keys_player_two)
-        self.drawTextOnSurface(self.font, (11, 162, 12), "First player that reaches 1001 points wins!",
+        self.drawTextOnSurface(self.font, (11, 162, 12), "First player that reaches 1000 points wins!",
                                (Configuration.windowWidth / 2, Configuration.windowHeight / 2))
 
         self.drawTextOnSurface(self.font, (11, 162, 12), "Controls",
-                               (Configuration.windowWidth / 2, Configuration.windowHeight *3 / 4))
+                               (Configuration.windowWidth / 2, Configuration.windowHeight * 3 / 4))
 
         super().updateScreen()  # display images on screen
-        sleep(4)
-
-        # start the gameloop
-        self.run()
+        sleep(4)  # wait for seconds
 
     def updateScore(self, player: int) -> None:
         """
@@ -390,7 +400,7 @@ class Pong(Game):
             self.ball.flip_velocity(mode="y")  # flip velocity vector on y-axis
 
         # determine winner of the round
-        winner = self.ball.determine_winner()
+        winner = self.ball.determine_round_winner()
         if winner:
 
             # calculate the score of the player based on the time it took to win
