@@ -9,6 +9,9 @@ class Configuration:
     MUSIC_VOLUME = 0.3
     FRAMERATE = 60
 
+    # TicTacToe
+    TTT_TILE_SIZE = 250
+
 
 class Colors:
     White = (255, 255, 255)
