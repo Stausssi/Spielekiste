@@ -1,3 +1,12 @@
+"""
+    file: main.py
+    description: Contains the entry point the application.
+
+    author: Niklas Drössler, Simon Stauss
+    date: 17.03.2021
+    licence: free
+"""
+
 # import os
 # # Remove pygame support message
 # os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
@@ -11,7 +20,9 @@ def main():
     """
     Application entry point starting the GameContainer and therefore the application.
 
-    :return: None
+    Tests:
+        - Logger legt Datei korrekt an
+        - Spiel startet korrekt
     """
 
     # Create logging file, rotate if filesize exceeds 1MB
