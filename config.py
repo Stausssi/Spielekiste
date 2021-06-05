@@ -12,16 +12,21 @@ class Configuration:
     MUSIC_VOLUME = 0.3
     FRAMERATE = 60
 
+    GAME_SNAKE = "Snake"
+    GAME_TTT = "TicTacToe"
+    GAME_PONG = "Pong"
+    GAME_SPACE_INVADERS = "Space Invaders"
+
     # Scores
     PLAYER_HEADER = "Player"
     SCORE_HEADER = "Score"
     WIN_HEADER = "Wins"
 
     DATA_HEADERS = {
-        "Snake": [PLAYER_HEADER, SCORE_HEADER],
-        "TicTacToe": [PLAYER_HEADER, WIN_HEADER],
-        "Pong": [PLAYER_HEADER, WIN_HEADER, SCORE_HEADER],
-        "Space Invaders": [PLAYER_HEADER, SCORE_HEADER]
+        GAME_SNAKE: [PLAYER_HEADER, SCORE_HEADER],
+        GAME_TTT: [PLAYER_HEADER, WIN_HEADER],
+        GAME_PONG: [PLAYER_HEADER, WIN_HEADER, SCORE_HEADER],
+        GAME_SPACE_INVADERS: [PLAYER_HEADER, SCORE_HEADER]
     }
 
     # Create the score dict containing a dataframe for each game
