@@ -590,6 +590,11 @@ class GameContainer(Game):
 
         Returns: None
         """
+
+        # Reset the flag in the config
+        Configuration.UPDATE_GAME_SCORE = ""
+
+        # Get the selected game
         game = self.getGameFromSelectValue(selectValue)
 
         # https://pygame-menu.readthedocs.io/en/4.0.7/_source/widgets_table.html
@@ -597,6 +602,7 @@ class GameContainer(Game):
         if self.highscoreMenu.get_widget("scores"):
             self.highscoreMenu.remove_widget("scores")
 
+        # Check if data exists
         scores = Configuration.SCORE_DATA[game]
         if scores is not None:
             if not scores.empty:
@@ -611,7 +617,6 @@ class GameContainer(Game):
                 )
                 table.default_cell_padding = 10
                 table.default_row_background_color = Colors.White
-
                 self.highscoreMenu.move_widget_index(table, 1)
 
                 # Add header row
@@ -655,9 +660,6 @@ class GameContainer(Game):
             game = self.getGameFromSelectValue(selectValue)
             if game == Configuration.UPDATE_GAME_SCORE:
                 self.updateScoreTable(selectValue)
-
-            # Reset the flag in the config
-            Configuration.UPDATE_GAME_SCORE = ""
 
     @staticmethod
     def getGameFromSelectValue(selectValue) -> str:
