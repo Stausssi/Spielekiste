@@ -36,6 +36,9 @@ class Configuration:
             game: pandas.read_csv(f"scores/{game}.csv")
         })
 
+    # Needed for dynamic table updates
+    UPDATE_GAME_SCORE = ""
+    
     # Snake specific constants
     SNAKE_TILE_SIZE = 50
     SNAKE_TILES_X = 15

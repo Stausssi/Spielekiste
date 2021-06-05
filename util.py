@@ -45,7 +45,7 @@ class Game:
         # Display
         title = Configuration.windowTitle
         if self.game != "":
-            title += f"| {self.game}"
+            title += f" | {self.game}"
         pygame.display.set_caption(title)
         self.surface = pygame.display.set_mode(size=self.windowSize)
         self.backgroundImage = None
@@ -172,6 +172,7 @@ class Game:
         Returns: None
         """
 
+        # TODO: Log
         # print("Unhandled event:", event)
         pass
 
@@ -200,7 +201,6 @@ class Game:
         pygame.display.update()
 
     def drawTextOnSurface(self, text, position, color=Colors.White, font=None, surface=None, center=True):
-
         """
         This method draws a given text on a surface.
 
@@ -360,9 +360,12 @@ class Game:
 
             self.drawImageOnSurface(self.nameBackground)
             self.surface.blit(nameInput.get_surface(), (self.nameInputX, self.nameInputY))
-            self.drawTextOnSurface(self.gameOverText,
-                                   (Configuration.windowWidth / 2, Configuration.windowHeight * 1 / 3),
-                                   Colors.White, font=self.endFont)
+            self.drawTextOnSurface(
+                self.gameOverText,
+                (Configuration.windowWidth / 2, Configuration.windowHeight * 1 / 3),
+                Colors.White,
+                font=self.endFont
+            )
 
             pygame.display.update()
 
@@ -410,6 +413,7 @@ class Game:
 
             # Update global scores
             Configuration.SCORE_DATA[self.game] = self.scores
+            Configuration.UPDATE_GAME_SCORE = self.game
 
     def setGameOverText(self, text: str):
         """
@@ -509,7 +513,8 @@ class GameContainer(Game):
             ],
             placeholder="Select a game",
             onchange=self.updateScoreTable,
-            margin=(0, 20)
+            margin=(0, 20),
+            dropselect_id="score_select"
         )
         self.highscoreMenu.add.button("Back", pygame_menu.events.BACK)
 
@@ -576,43 +581,96 @@ class GameContainer(Game):
             toggle.set_value(self.isFullscreen)
             self.mainMenu.render()
 
-    def updateScoreTable(self, game, *args):
+    def updateScoreTable(self, selectValue, *args):
         """
         This method updates the table displaying the scores in the highscore menu.
 
         Args:
-            game (str): The game to get the scores from
+            selectValue (tuple[tuple[str, str], int]): The value of the dropdown select
 
         Returns: None
         """
-        game = game[0][0]
+        game = self.getGameFromSelectValue(selectValue)
 
         # https://pygame-menu.readthedocs.io/en/4.0.7/_source/widgets_table.html
         # Remove table from highscore menu if it exists
         if self.highscoreMenu.get_widget("scores"):
             self.highscoreMenu.remove_widget("scores")
 
-        # Create a new table and move it to the correct index
-        table = self.highscoreMenu.add.table(
-            "scores",
-            font_color=Colors.Black,
-            margin=(0, 20)
-        )
-        table.default_cell_padding = 10
-        table.default_row_background_color = Colors.White
+        scores = Configuration.SCORE_DATA[game]
+        if scores is not None:
+            if not scores.empty:
+                if self.highscoreMenu.get_widget("no_scores"):
+                    self.highscoreMenu.remove_widget("no_scores")
 
-        self.highscoreMenu.move_widget_index(table, 1)
+                # Create a new table and move it to the correct index
+                table = self.highscoreMenu.add.table(
+                    "scores",
+                    font_color=Colors.Black,
+                    margin=(0, 20)
+                )
+                table.default_cell_padding = 10
+                table.default_row_background_color = Colors.White
 
-        # Add header row
-        table.add_row(
-            cells=Configuration.DATA_HEADERS[game]
-        )
+                self.highscoreMenu.move_widget_index(table, 1)
 
-        # Add a row for the top 10
-        for row in Configuration.SCORE_DATA[game].head(10).itertuples(index=False):
-            table.add_row(row)
+                # Add header row
+                table.add_row(
+                    cells=Configuration.DATA_HEADERS[game]
+                )
 
-        # TODO: Prevent empty table
+                # Add a row for the top 10
+                for row in scores.head(10).itertuples(index=False):
+                    table.add_row(row)
+
+                # Create a draw callback to be fired each time the table is drawn.
+                # This is used to refresh the table
+                table.add_draw_callback(self.refreshScoreTable)
+            else:
+                # Display a label telling the user no scores are available just yet
+                label = self.highscoreMenu.add.label(
+                    title=f"No scores available for {game} yet! Make sure to be the first one!",
+                    label_id="no_scores",
+                    margin=(0, 20)
+                )
+                self.highscoreMenu.move_widget_index(label, 1)
+
+    def refreshScoreTable(self, widget, menu):
+        """
+        This method is a draw callback from the highscore table meaning it is called every time the score table is
+        drawn. This is needed to update the table after a new score was set and the widget wasn't reloaded.
+
+        Args:
+            widget (pygame_menu.widgets.core.widget.Widget): The widget that was drawn. In this case it is the table
+            menu (pygame_menu.menu.Menu): The menu the widget is in
+
+        Returns: None
+        """
+
+        # Get the currently selected game
+        select = menu.get_widget("score_select")
+        if select:
+            # Update the table if the flag is the same as the selected game
+            selectValue = select.get_value()
+            game = self.getGameFromSelectValue(selectValue)
+            if game == Configuration.UPDATE_GAME_SCORE:
+                self.updateScoreTable(selectValue)
+
+            # Reset the flag in the config
+            Configuration.UPDATE_GAME_SCORE = ""
+
+    @staticmethod
+    def getGameFromSelectValue(selectValue) -> str:
+        """
+        This method returns the game of a given dropdown select value.
+
+        Args:
+            selectValue (tuple[tuple[str, str], int]): The value of the dropdown select
+
+        Returns: The selected game
+        """
+
+        return selectValue[0][0]
 
     def quit(self):
         """
