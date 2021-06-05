@@ -361,8 +361,9 @@ class Game:
 
             self.drawImageOnSurface(self.nameBackground)
             self.surface.blit(nameInput.get_surface(), (self.nameInputX, self.nameInputY))
-            self.drawTextOnSurface(self.endFont, (0, 0, 0), self.gameOverText,
-                                   (Configuration.windowWidth / 2, Configuration.windowHeight * 1 / 3))
+            self.drawTextOnSurface(self.gameOverText,
+                                   (Configuration.windowWidth / 2, Configuration.windowHeight * 1 / 3),
+                                   Colors.White, font=self.endFont)
 
             pygame.display.update()
 

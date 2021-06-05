@@ -61,3 +61,4 @@ class Colors:
     Green = (0, 150, 0)
     Red = (255, 0, 0)
     DarkRed = (150, 0, 0)
+    ByteGreen = (11, 162, 12)

@@ -10,6 +10,7 @@ from random import randint
 import numpy as np
 from time import time
 from time import sleep
+from config import Colors
 
 
 class Player(Image):
@@ -246,6 +247,10 @@ class Pong(Game):
 
         self.hasComputerPlayer = hasComputerPlayer  # determines, if player two should be a computer player
 
+        # deactivate the internal scoring system of the gaming to use an own scoring system
+        self.hasScore = False
+        self.showGameOver = True
+
         self.font = pygame.font.SysFont(None, 78)  # initialize the font
 
         # Player Setup
@@ -297,13 +302,15 @@ class Pong(Game):
         self.surface.fill((0, 0, 0))
         self.drawImageOnSurface(logo)
         self.drawImageOnSurface(keys_player_one)
-        if not self.hasComputerPlayer:
+        if not self.hasComputerPlayer: # only draw the control of the second player, if he isn´t a computer player
             self.drawImageOnSurface(keys_player_two)
-        self.drawTextOnSurface(self.font, (11, 162, 12), "First player that reaches 1000 points wins!",
-                               (Configuration.windowWidth / 2, Configuration.windowHeight / 2))
+        self.drawTextOnSurface("First player that reaches 1000 points wins!",
+                               (Configuration.windowWidth / 2, Configuration.windowHeight / 2), Colors.ByteGreen,
+                               font=self.font)
 
-        self.drawTextOnSurface(self.font, (11, 162, 12), "Controls",
-                               (Configuration.windowWidth / 2, Configuration.windowHeight * 3 / 4))
+        self.drawTextOnSurface("Controls",
+                               (Configuration.windowWidth / 2, Configuration.windowHeight * 3 / 4), Colors.ByteGreen,
+                               font=self.font)
 
         super().updateScreen()  # display images on screen
         sleep(4)  # wait for seconds
@@ -445,19 +452,23 @@ class Pong(Game):
         """
 
         # fill game display black
-        self.surface.fill((0, 0, 0))
+        self.surface.fill(Colors.Black)
 
         # draw players and ball
         self.drawImageOnSurface(self.player_one)
         self.drawImageOnSurface(self.player_two)
         self.drawImageOnSurface(self.ball)
+
+        # draw all the spacer images
         for image in self.spacers:
             self.drawImageOnSurface(image)
 
-        # draw scores
-        self.drawTextOnSurface(self.font, (11, 162, 12), format(self._score[0], "04b"),
-                               (Configuration.windowWidth / 4, Configuration.windowHeight / 2))
-        self.drawTextOnSurface(self.font, (11, 162, 12), format(self._score[1], "04b"),
-                               (3 * Configuration.windowWidth / 4, Configuration.windowHeight / 2))
+        # draw scores and format the scores in byte representation
+        self.drawTextOnSurface(format(self._score[0], "04b"),
+                               (Configuration.windowWidth / 4, Configuration.windowHeight / 2), Colors.ByteGreen,
+                               font=self.font)
+        self.drawTextOnSurface(format(self._score[1], "04b"),
+                               (3 * Configuration.windowWidth / 4, Configuration.windowHeight / 2), Colors.ByteGreen,
+                               font=self.font)
 
         super().updateScreen()  # call the parent method to update the screen
