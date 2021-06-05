@@ -13,8 +13,11 @@ class Snake(Game):
         Snake is a game where the player moves around a given map controlling a snake.
         The objective is to survive as long as possible while eating as much food as possible
 
-        This textures of the snake are copied from: https://rembound.com/articles/creating-a-snake-game-tutorial-with-html5
-        Fruits (food) are from Victor Stambert: https://veo_the_artist.artstation.com/projects/oOYoDq
+        This textures of the snake are copied from:
+        https://rembound.com/articles/creating-a-snake-game-tutorial-with-html5
+
+        Fruits (food) are from Victor Stambert:
+        https://veo_the_artist.artstation.com/projects/oOYoDq
         """
 
         super().__init__(game=Configuration.GAME_SNAKE)

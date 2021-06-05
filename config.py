@@ -1,5 +1,4 @@
 import pandas
-from pandas import DataFrame
 
 
 class Configuration:

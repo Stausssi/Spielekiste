@@ -588,6 +588,7 @@ class GameContainer(Game):
 
         Args:
             selectValue (tuple[tuple[str, str], int]): The value of the dropdown select
+            args: pygame_menu requirement. Will not be used in this method.
 
         Returns: None
         """
