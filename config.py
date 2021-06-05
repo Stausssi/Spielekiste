@@ -25,7 +25,7 @@ class Configuration:
     DATA_HEADERS = {
         GAME_SNAKE: [PLAYER_HEADER, SCORE_HEADER],
         GAME_TTT: [PLAYER_HEADER, WIN_HEADER],
-        GAME_PONG: [PLAYER_HEADER, WIN_HEADER, SCORE_HEADER]
+        GAME_PONG: [PLAYER_HEADER, SCORE_HEADER]
     }
 
     # Create the score dict containing a dataframe for each game
