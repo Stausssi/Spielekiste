@@ -240,6 +240,10 @@ class Pong(Game):
     This class is a child class of the Game class. Apart from the parent functions it handles the general gameloop
     of the pong game, instantiates the players and the ball, handles key events and the scoring system. Furthermore it
     creates the score counters and handles the general screen updates.
+
+    Sounds: Official Atari Pong Sounds, taken from the following Youtube Video:
+    https://www.youtube.com/watch?v=qhaS2uMNTjI
+
     """
 
     def __init__(self, hasComputerPlayer):
@@ -273,8 +277,14 @@ class Pong(Game):
             self.spacers.append(
                 Image(Configuration.windowWidth / 2, 40 * i, (10, 30), "spacer.png", pathToImage="images/Pong/"))
 
-        # render the pregame animation screen
+        # load sounds
+        self.sounds = {
+            "wall_collision": pygame.mixer.Sound("sounds/Pong/wall_collision.wav"),
+            "player_collision": pygame.mixer.Sound("sounds/Pong/player_collision.wav"),
+            "fail": pygame.mixer.Sound("sounds/Pong/fail.wav")
+        }
 
+        # render the pregame animation screen
         self.preGameScreen()
 
         # start the gameloop
@@ -426,6 +436,7 @@ class Pong(Game):
         # collision handling of the ball
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
             self.ball.flip_velocity(mode="x")  # flip velocity vector on x-axis
+            self.playSound("player_collision")
 
             # change the sensitivity and speed of the computer player every bounce to make the game more interesting
             if self.hasComputerPlayer:
@@ -433,10 +444,14 @@ class Pong(Game):
 
         if self.ball.did_collide_top_bottom():
             self.ball.flip_velocity(mode="y")  # flip velocity vector on y-axis
+            self.playSound("wall_collision")
 
         # determine winner of the round
         round_winner = self.ball.determine_round_winner()
         if round_winner:
+
+            self.playSound("fail")
+
             if round_winner == 1:
                 # increase player one score
                 self.updateScore(1)
