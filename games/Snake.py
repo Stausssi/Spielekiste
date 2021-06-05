@@ -17,7 +17,7 @@ class Snake(Game):
         Fruits (food) are from Victor Stambert: https://veo_the_artist.artstation.com/projects/oOYoDq
         """
 
-        super().__init__(title=Configuration.windowTitle + " | Snake")
+        super().__init__(game=Configuration.GAME_SNAKE)
 
         # Calc width and height of the field
         self.width = Configuration.SNAKE_TILES_X * Configuration.SNAKE_TILE_SIZE

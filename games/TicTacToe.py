@@ -7,7 +7,7 @@ from util import Game, Image
 
 class TicTacToe(Game):
     def __init__(self):
-        super().__init__()
+        super().__init__(game=Configuration.GAME_TTT)
 
         # Disable score but still show name enter if someone won
         self.hasScore = False
