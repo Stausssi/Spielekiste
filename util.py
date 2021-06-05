@@ -77,7 +77,7 @@ class Game:
 
         self.score = 0
         self.gameOverText = ""  # has to be set by the specific game
-        self.endFont = pygame.font.SysFont(None, 60)
+        self.endFont = pygame.font.SysFont("arial", 60)
         self.nameSubmit = False
         self.nameInputX, self.nameInputY = (Configuration.windowWidth // 2, Configuration.windowHeight // 2)
         self.nameBackground = Image(
@@ -487,7 +487,7 @@ class GameContainer(Game):
         # Add games to play menu
         self.playMenu.add.button(f"Play {Configuration.GAME_SNAKE}", self.startSnake)
         self.playMenu.add.button(f"Play {Configuration.GAME_TTT}", self.startTTT)
-        self.playMenu.add.button(f"Play {Configuration.GAME_PONG}", self.startPong)
+        self.playMenu.add.button(f"Play {Configuration.GAME_PONG}", self.pongMenu)
         self.playMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to options menu
@@ -514,8 +514,8 @@ class GameContainer(Game):
         self.highscoreMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to pong menu
-        self.pongMenu.add.button("Two players", self.startPongMultiplayer)
         self.pongMenu.add.button("One player", self.startPongComputer)
+        self.pongMenu.add.button("Two players", self.startPongMultiplayer)
         self.pongMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Quit the game on esc
