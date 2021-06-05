@@ -242,8 +242,16 @@ class Pong(Game):
     creates the score counters and handles the general screen updates.
 
     Sounds: Official Atari Pong Sounds, taken from the following Youtube Video:
-    https://www.youtube.com/watch?v=qhaS2uMNTjI
+            - https://www.youtube.com/watch?v=qhaS2uMNTjI
+            All Credits go to Atari.
 
+    Images:
+        AandD.png: selfmade
+        ArrowLeftRight.png: selfmade
+        ballbyte.png: selfmade
+        plane.png: selfmade
+        PongLogo.png: created with: https://de.flamingtext.com/Free-Logo-Designs/
+        spacer.png: selfmade
     """
 
     def __init__(self, hasComputerPlayer):
@@ -310,7 +318,7 @@ class Pong(Game):
                                 "ArrowLeftRight.png", pathToImage="images/Pong/")
 
         # draw text and images
-        self.surface.fill((0, 0, 0))
+        self.surface.fill(Colors.Black)
         self.drawImageOnSurface(logo)
         self.drawImageOnSurface(keys_player_one)
         if not self.hasComputerPlayer:  # only draw the control of the second player, if he isn´t a computer player
@@ -328,7 +336,7 @@ class Pong(Game):
 
     def startGameOverScreen(self, player: int):
         """
-        This function calculates the score of the winning player and start the gameover screen. The screen contains
+        This function calculates the score of the winning player and starts the gameover screen. The screen contains
         a specific text and the players score, it is set by calling the method setGameOverText().
 
         Args:
@@ -398,7 +406,7 @@ class Pong(Game):
                     self.player_two.move_down = True
 
         # Handle keyup events
-        if event.type == pygame.KEYUP:
+        elif event.type == pygame.KEYUP:
             # player one movement
             # Stop moving up
             if event.key == pygame.K_a:
