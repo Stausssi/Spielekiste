@@ -8,6 +8,7 @@
 """
 
 import pandas
+from pandas.errors import EmptyDataError
 
 
 class Configuration:
@@ -44,8 +45,29 @@ class Configuration:
     SCORE_DATA = {}
     for game in DATA_HEADERS.keys():
         # Get the highest scores from the csv file
+        frame = None
+        try:
+            frame = pandas.read_csv(f"scores/{game}.csv")
+        except EmptyDataError:
+            # TODO: Log csv file is empty
+            pass
+        except FileNotFoundError:
+            # TODO: Log csv file missing
+            pass
+        finally:
+            if frame is None:
+                # Create a new DataFrame
+                dataDict = {}
+                for header in DATA_HEADERS[game]:
+                    dataDict.update({
+                        header: []
+                    })
+
+                frame = pandas.DataFrame(data=dataDict)
+
+        print(frame)
         SCORE_DATA.update({
-            game: pandas.read_csv(f"scores/{game}.csv")
+            game: frame
         })
 
     # Needed for dynamic table updates
