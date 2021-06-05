@@ -1,6 +1,3 @@
-from pandas import DataFrame
-
-
 class Configuration:
     """
     A static configuration class containing the most important values, such as windows size, etc.
@@ -13,57 +10,12 @@ class Configuration:
     FRAMERATE = 60
 
     # Scores
-    PLAYER_HEADER = "Player"
-    SCORE_HEADER = "Score"
-    WIN_HEADER = "Wins"
-
-    DATA_HEADERS = {
-        "Snake": [PLAYER_HEADER, SCORE_HEADER],
-        "TicTacToe": [PLAYER_HEADER, WIN_HEADER],
-        "Pong": [PLAYER_HEADER, WIN_HEADER, SCORE_HEADER],
-        "Space Invaders": [PLAYER_HEADER, SCORE_HEADER]
+    SCORES_HEADER = {
+        "Snake": ["Score"],
+        "TicTacToe": ["Wins"],
+        "Pong": ["Wins", "Score"],
+        "Space Invaders": ["Score"]
     }
-
-    # Create the score dict containing a dataframe for each game
-    SCORE_DATA = {}
-    for game in DATA_HEADERS.keys():
-        data = {}
-        for dataHeader in DATA_HEADERS[game]:
-            data.update({
-                dataHeader: []
-            })
-
-        SCORE_DATA.update({
-            game: DataFrame(data=data)
-        })
-
-    # SCORES = {
-    #     "Snake": DataFrame(
-    #         data={
-    #             SCORES_HEADER["Snake"][0]: None,
-    #             SCORES_HEADER["Snake"][1]: None
-    #         }
-    #     ),
-    #     "TicTacToe": DataFrame(
-    #         data={
-    #             SCORES_HEADER["TicTacToe"][0]: None,
-    #             SCORES_HEADER["TicTacToe"][1]: None
-    #         }
-    #     ),
-    #     "Pong": DataFrame(
-    #         data={
-    #             SCORES_HEADER["Pong"][0]: None,
-    #             SCORES_HEADER["Pong"][1]: None,
-    #             SCORES_HEADER["Pong"][2]: None
-    #         }
-    #     ),
-    #     "Space Invaders": DataFrame(
-    #         data={
-    #             SCORES_HEADER["Space Invaders"][0]: None,
-    #             SCORES_HEADER["Space Invaders"][1]: None
-    #         }
-    #     ),
-    # }
 
 
 class Colors:

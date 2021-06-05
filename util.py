@@ -1,6 +1,6 @@
 import os
+import random
 import pygame
-from pandas import DataFrame
 
 from pygame_textinput import TextInput
 import pygame_menu
@@ -9,7 +9,7 @@ from config import Configuration, Colors
 
 
 class Game:
-    def __init__(self, game="", windowSize=Configuration.windowSize):
+    def __init__(self, title=Configuration.windowTitle, windowSize=Configuration.windowSize):
         """
         Superclass for every component in this application.
 
@@ -17,21 +17,16 @@ class Game:
         modified by the children.
 
         Args:
-            game (str): The name of the game
+            title (str): The title of the pygame window
             windowSize (tuple[int, int]): The size of the pygame window
         """
 
-        self.game = game
         self.isRunning = True
         self.isGameOver = False
         self.isPaused = False
         self.hasScore = True
         self.score = 0
         self.scoreX, self.scoreY = (windowSize[0] // 2, 100)
-        try:
-            self.scores = Configuration.SCORE_DATA[game]
-        except KeyError:
-            self.scores = None
 
         self.windowSize = windowSize
         self.events = None
@@ -42,9 +37,6 @@ class Game:
         pygame.init()
 
         # Display
-        title = Configuration.windowTitle
-        if self.game != "":
-            title += f"| {self.game}"
         pygame.display.set_caption(title)
         self.surface = pygame.display.set_mode(size=self.windowSize)
         self.backgroundImage = None
@@ -307,30 +299,7 @@ class Game:
 
         # Ask the user for their name to save the score
         name = self.getUserName()
-
-        # Create the values to be saved to the DataFrame
-        values = {
-            Configuration.PLAYER_HEADER: name
-        }
-
-        try:
-            dataHeader = Configuration.DATA_HEADERS[self.game]
-        except KeyError:
-            dataHeader = None
-
-        if dataHeader:
-            for header in dataHeader:
-                if header != Configuration.PLAYER_HEADER:
-                    # Add 1 win or the score
-                    value = 1
-                    if header == Configuration.SCORE_HEADER:
-                        value = self.score
-
-                    values.update({
-                        header: [value]
-                    })
-
-            self.saveScore(DataFrame(data=values))
+        self.saveScore(name)
 
     def getUserName(self) -> str:
         """
@@ -356,43 +325,18 @@ class Game:
 
         return nameInput.get_text()
 
-    def saveScore(self, values):
+    def saveScore(self, name):
         """
         This method saves the score of the user in a game
 
         Args:
-            values (DataFrame): The data to be appended to the dataframe. It contains the player name and other
-                value(s)
+            name (str): The name of the user
 
         Returns: None
         """
 
-        if self.scores is not None:
-            self.scores = self.scores.append(values, ignore_index=True)
-
-            # Sum wins grouped by Player
-            if Configuration.WIN_HEADER in self.scores.columns:
-                self.scores = self.scores.\
-                    groupby(Configuration.PLAYER_HEADER, as_index=False)[Configuration.WIN_HEADER].\
-                    sum()
-
-            # Sort the DataFrame
-            # Sort after score by default
-            sortType = Configuration.SCORE_HEADER
-
-            if sortType not in self.scores.columns:
-                # Sort after wins
-                sortType = Configuration.WIN_HEADER
-
-            # Sort the data in a descending order
-            self.scores.sort_values(
-                by=[sortType],
-                ascending=False,
-                inplace=True
-            )
-
-            # Update global scores
-            Configuration.SCORE_DATA[self.game] = self.scores
+        # print(self.score, name)
+        pass
 
     def quit(self):
         """
@@ -567,14 +511,18 @@ class GameContainer(Game):
         self.highscoreMenu.move_widget_index(table, 1)
 
         # Add header row
+        headerRow = ["Player"]
+        headerRow.extend(Configuration.SCORES_HEADER[game])
+
         table.add_row(
-            cells=Configuration.DATA_HEADERS[game]
+            cells=headerRow
         )
 
         # TODO: Fill with real data
-        print(Configuration.SCORE_DATA[game])
-        for i in Configuration.SCORE_DATA[game].itertuples():
-            print("Rows:", i)
+        for i in range(10):
+            table.add_row(
+                cells=["Simon", random.randrange(i, (i + 1) * 100, 1)]
+            )
 
     def quit(self):
         """
