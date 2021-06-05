@@ -1,5 +1,4 @@
 import pandas
-from pandas import DataFrame
 
 
 class Configuration:
@@ -25,7 +24,7 @@ class Configuration:
     DATA_HEADERS = {
         GAME_SNAKE: [PLAYER_HEADER, SCORE_HEADER],
         GAME_TTT: [PLAYER_HEADER, WIN_HEADER],
-        GAME_PONG: [PLAYER_HEADER, WIN_HEADER, SCORE_HEADER]
+        GAME_PONG: [PLAYER_HEADER, SCORE_HEADER]
     }
 
     # Create the score dict containing a dataframe for each game
@@ -35,6 +34,9 @@ class Configuration:
         SCORE_DATA.update({
             game: pandas.read_csv(f"scores/{game}.csv")
         })
+
+    # Needed for dynamic table updates
+    UPDATE_GAME_SCORE = ""
 
     # Snake specific constants
     SNAKE_TILE_SIZE = 50
