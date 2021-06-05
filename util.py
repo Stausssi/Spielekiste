@@ -74,6 +74,10 @@ class Game:
         self.pauseBehaviour = self.drawMenu
 
         # Create variables needed for the game end screen
+
+        self.score = 0
+        self.gameOverText = ""  # has to be set by the specific game
+        self.endFont = pygame.font.SysFont(None, 60)
         self.nameSubmit = False
         self.nameInputX, self.nameInputY = (Configuration.windowWidth // 2, Configuration.windowHeight // 2)
         self.nameBackground = Image(
@@ -137,7 +141,7 @@ class Game:
         # Loop through every event
         for event in self.events:
             eventHandled = False
-            
+
             if event.type == pygame.QUIT:
                 self.quit()
                 eventHandled = True
@@ -196,13 +200,14 @@ class Game:
         pygame.display.update()
 
     def drawTextOnSurface(self, text, position, color=Colors.White, font=None, surface=None, center=True):
+
         """
         This method draws a given text on a surface.
 
         Args:
-            color (tuple[int, int, int]): The color of the drawn text
             text (String): The text to draw
             position ((int, int)): The position of the top left corner of the text
+            color (tuple[int, int, int]): The color of the drawn text
             font (pygame.font.Font): The font of the text. Defaults to self.defaultFont
             surface (pygame.surface.Surface): The surface to draw the text on. Defaults to the default surface of the
                 class
@@ -336,6 +341,9 @@ class Game:
 
             self.saveScore(DataFrame(data=values))
 
+        self.saveScore(name)
+        self.gameOverText = ""  # clear gameover text
+
     def getUserName(self) -> str:
         """
         This method shows an input dialog for the user to write their name.
@@ -353,6 +361,8 @@ class Game:
 
             self.drawImageOnSurface(self.nameBackground)
             self.surface.blit(nameInput.get_surface(), (self.nameInputX, self.nameInputY))
+            self.drawTextOnSurface(self.endFont, (0, 0, 0), self.gameOverText,
+                                   (Configuration.windowWidth / 2, Configuration.windowHeight * 1 / 3))
 
             pygame.display.update()
 
@@ -397,6 +407,17 @@ class Game:
 
             # Update global scores
             Configuration.SCORE_DATA[self.game] = self.scores
+
+    def setGameOverText(self, text: str):
+        """
+        This function generates a gameover text when a player has won or lost that will be displayed on the endscreen.
+        It internally sets the attribute gameOverText.
+
+        Args:
+            text (str): the text that will be displayed on the endscreen
+        """
+
+        self.gameOverText = text
 
     def quit(self):
         """
@@ -447,6 +468,12 @@ class GameContainer(Game):
             height=self.windowSize[1],
             theme=pygame_menu.themes.THEME_DARK
         )
+        self.pongMenu = pygame_menu.Menu(
+            title="Number of players",
+            width=self.windowSize[0],
+            height=self.windowSize[1],
+            theme=pygame_menu.themes.THEME_DARK
+        )
 
         # Add buttons to main menu
         self.mainMenu.add.button("Play", self.playMenu)
@@ -457,7 +484,7 @@ class GameContainer(Game):
         # Add games to play menu
         self.playMenu.add.button("Play Snake", self.startSnake)
         self.playMenu.add.button("Play Tic Tac Toe", self.startTTT)
-        self.playMenu.add.button("Play Pong", self.startPong)
+        self.playMenu.add.button("Play Pong", self.pongMenu)
         self.playMenu.add.button("Play Space-Invader", self.startSpaceInvader)
         self.playMenu.add.button("Back", pygame_menu.events.BACK)
 
@@ -484,6 +511,11 @@ class GameContainer(Game):
             margin=(0, 20)
         )
         self.highscoreMenu.add.button("Back", pygame_menu.events.BACK)
+
+        # Add buttons to pong menu
+        self.pongMenu.add.button("Two players", self.startPongMultiplayer)
+        self.pongMenu.add.button("One player", self.startPongComputer)
+        self.pongMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Quit the game on esc
         self.pauseBehaviour = self.quit
@@ -516,13 +548,22 @@ class GameContainer(Game):
         TicTacToe()
 
     @staticmethod
-    def startPong():
+    def startPongMultiplayer():
         """
-        This functions starts the Pong-Game
+        This functions starts the Pong-Game with two players
         """
 
         from games.Pong import Pong
-        Pong()
+        Pong(False)
+
+    @staticmethod
+    def startPongComputer():
+        """
+        This functions starts the Pong-Game with a computer player
+        """
+
+        from games.Pong import Pong
+        Pong(True)
 
     @staticmethod
     def startSpaceInvader():
