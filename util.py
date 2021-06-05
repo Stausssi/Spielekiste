@@ -395,6 +395,9 @@ class Game:
                 inplace=True
             )
 
+            # Save the csv file without the index
+            self.scores.to_csv(f"scores/{self.game}.csv", index=False)
+
             # Update global scores
             Configuration.SCORE_DATA[self.game] = self.scores
 
@@ -430,13 +433,13 @@ class GameContainer(Game):
             theme=pygame_menu.themes.THEME_DARK  # title_close_button=False
         )
         self.playMenu = pygame_menu.Menu(
-            title="Spiel wählen",
+            title="Choose Game",
             width=self.windowSize[0],
             height=self.windowSize[1],
             theme=pygame_menu.themes.THEME_DARK
         )
         self.optionsMenu = pygame_menu.Menu(
-            title="Optionen",
+            title="Options",
             width=self.windowSize[0],
             height=self.windowSize[1],
             theme=pygame_menu.themes.THEME_DARK
@@ -455,10 +458,9 @@ class GameContainer(Game):
         self.mainMenu.add.button("Quit", self.quit)
 
         # Add games to play menu
-        self.playMenu.add.button("Play Snake", self.startSnake)
-        self.playMenu.add.button("Play Tic Tac Toe", self.startTTT)
-        self.playMenu.add.button("Play Pong", self.startPong)
-        self.playMenu.add.button("Play Space-Invader", self.startSpaceInvader)
+        self.playMenu.add.button(f"Play {Configuration.GAME_SNAKE}", self.startSnake)
+        self.playMenu.add.button(f"Play {Configuration.GAME_TTT}", self.startTTT)
+        self.playMenu.add.button(f"Play {Configuration.GAME_PONG}", self.startPong)
         self.playMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to options menu
@@ -474,10 +476,9 @@ class GameContainer(Game):
         self.highscoreMenu.add.dropselect(
             title="Game",
             items=[
-                ("Snake", "Snake"),
-                ("TicTacToe", "TicTacToe"),
-                ("Pong", "Pong"),
-                ("Space Invaders", "Space Invaders")
+                (Configuration.GAME_SNAKE, Configuration.GAME_SNAKE),
+                (Configuration.GAME_TTT, Configuration.GAME_TTT),
+                (Configuration.GAME_PONG, Configuration.GAME_PONG),
             ],
             placeholder="Select a game",
             onchange=self.updateScoreTable,
@@ -524,15 +525,6 @@ class GameContainer(Game):
         from games.Pong import Pong
         Pong()
 
-    @staticmethod
-    def startSpaceInvader():
-        """
-        This functions starts the Pong-Game
-        """
-
-        from games.SpaceInvader import SpaceInvader
-        SpaceInvader()
-
     def toggleFullscreen(self, *args):
         super().toggleFullscreen()
 
@@ -575,10 +567,11 @@ class GameContainer(Game):
             cells=Configuration.DATA_HEADERS[game]
         )
 
-        # TODO: Fill with real data
-        print(Configuration.SCORE_DATA[game])
-        for i in Configuration.SCORE_DATA[game].itertuples():
-            print("Rows:", i)
+        # Add a row for the top 10
+        for row in Configuration.SCORE_DATA[game].head(10).itertuples(index=False):
+            table.add_row(row)
+
+        # TODO: Prevent empty table
 
     def quit(self):
         """

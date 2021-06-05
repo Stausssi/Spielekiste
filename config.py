@@ -1,3 +1,4 @@
+import pandas
 from pandas import DataFrame
 
 
@@ -15,7 +16,6 @@ class Configuration:
     GAME_SNAKE = "Snake"
     GAME_TTT = "TicTacToe"
     GAME_PONG = "Pong"
-    GAME_SPACE_INVADERS = "Space Invaders"
 
     # Scores
     PLAYER_HEADER = "Player"
@@ -25,21 +25,15 @@ class Configuration:
     DATA_HEADERS = {
         GAME_SNAKE: [PLAYER_HEADER, SCORE_HEADER],
         GAME_TTT: [PLAYER_HEADER, WIN_HEADER],
-        GAME_PONG: [PLAYER_HEADER, WIN_HEADER, SCORE_HEADER],
-        GAME_SPACE_INVADERS: [PLAYER_HEADER, SCORE_HEADER]
+        GAME_PONG: [PLAYER_HEADER, WIN_HEADER, SCORE_HEADER]
     }
 
     # Create the score dict containing a dataframe for each game
     SCORE_DATA = {}
     for game in DATA_HEADERS.keys():
-        data = {}
-        for dataHeader in DATA_HEADERS[game]:
-            data.update({
-                dataHeader: []
-            })
-
+        # Get the highest scores from the csv file
         SCORE_DATA.update({
-            game: DataFrame(data=data)
+            game: pandas.read_csv(f"scores/{game}.csv")
         })
 
     # Snake specific constants
