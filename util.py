@@ -1,3 +1,13 @@
+"""
+    file: util.py
+    description: Contains the main classes of the application. Main classes meaning the Game superclass,
+    GameContainer to display the main menu and Image to display an image on the screen
+
+    author: Niklas Drössler, Simon Stauss
+    date: 25.03.2021
+    licence: free
+"""
+
 import os
 import pygame
 from pandas import DataFrame
@@ -15,6 +25,10 @@ class Game:
 
         Implements predefined behaviour and supplies the children with method-prototypes, which will be slightly
         modified by the children.
+
+        Tests:
+            - Alle Variablen korrekt angelegt und Fehler abgefangen
+            - Nichts wichtiges überschrieben durch Kinderklassen
 
         Args:
             game (str): The name of the game
@@ -88,13 +102,17 @@ class Game:
             hasColorkey=False
         )
 
-    def run(self):
+    def run(self) -> None:
         """
         Main loop of the application.
         Calls methods self.updateEvents(), self.updateGameState() and self.updateScreen() while self.isRunning is True.
         If self.isRunning is False, self.gameOver() will be called to ask the user for their name.
         
         !DO NOT OVERWRITE THIS METHOD!
+
+        Tests:
+            - Keine Möglichkeit Fehler zu produzieren
+            - Programmablauf immer gleich und keine Möglichkeit frühzeitig zu verlasen
 
         Returns: None
         """
@@ -123,12 +141,16 @@ class Game:
         if self.isGameOver and (self.hasScore or self.showGameOver):
             self.gameOver()
 
-    def updateEvents(self, nameInput=False):
+    def updateEvents(self, nameInput=False) -> None:
         """
         This functions gets every pygame event and handles quit and pause.
         Unhandled Events are passed down to self.handleEvent() to be handled by children classes.
 
         !DO NOT OVERWRITE THIS METHOD!
+
+        Tests:
+            - Nur Events abfangen, die in Kinderklassen nicht benötigt werden
+            - Kein Event überspringen / Nicht beachten -> Logging überprüfen
 
         Args:
             nameInput (bool): Specifies whether the game is currently waiting for the user to input their name
@@ -145,26 +167,35 @@ class Game:
             if event.type == pygame.QUIT:
                 self.quit()
                 eventHandled = True
+
             if event.type == pygame.KEYDOWN:
                 # Toggle pause on ESC
                 if event.key == pygame.K_ESCAPE:
                     self.togglePause()
                     eventHandled = True
+
+                # Toggle Fullscreen on F11
                 elif event.key == pygame.K_F11:
                     self.toggleFullscreen()
+                    eventHandled = True
 
-                if nameInput and event.key == pygame.K_RETURN:
+                # Enter name on Enter
+                elif event.key == pygame.K_RETURN and nameInput:
                     self.nameSubmit = True
                     eventHandled = True
 
             if not eventHandled:
-                # further event handling
+                # Further event handling
                 self.handleEvent(event)
 
-    def handleEvent(self, event):
+    def handleEvent(self, event) -> None:
         """
         This method specifies game-specific behavior on pygame events.
         Overwrite this method in your class!
+
+        Tests:
+            - Korrektes Logging des Events
+            - Rest siehe Testbeschreibung der Kinderklassen
 
         Args:
             event (pygame.event.Event): The to be handled event
@@ -173,22 +204,28 @@ class Game:
         """
 
         # TODO: Log
-        # print("Unhandled event:", event)
         pass
 
-    def updateGameState(self):
+    def updateGameState(self) -> None:
         """
         This method handles all game-specific state changes. It is to be implemented by the children classes.
+
+        Tests:
+            - Siehe Testbeschreibungen in den Kinderklassen
 
         Returns: None
         """
 
         pass
 
-    def updateScreen(self):
+    def updateScreen(self) -> None:
         """
         This method updates the pygame window.
         It also handles pause behaviour.
+
+        Tests:
+            - Korrektes Verhalten des Pausenmenüs
+            - Score wird fehlerlos angezeigt
         """
 
         if self.isPaused:
@@ -200,9 +237,14 @@ class Game:
 
         pygame.display.update()
 
-    def drawTextOnSurface(self, text, position, color=Colors.White, font=None, surface=None, center=True):
+    def drawTextOnSurface(self, text, position, color=Colors.White, font=None, surface=None, center=True) -> None:
         """
         This method draws a given text on a surface.
+
+        Tests:
+            - Korrekte Defaultparameter
+            - Richtige Darstellung des Textes
+            - Keine Fehler durch falsche Variablen
 
         Args:
             text (String): The text to draw
@@ -230,9 +272,13 @@ class Game:
 
         surface.blit(textSurface, position)
 
-    def drawImageOnSurface(self, image, position=None, surface=None):
+    def drawImageOnSurface(self, image, position=None, surface=None) -> None:
         """
         This method draws a given image on a surface.
+
+        Tests:
+            - Korrekte Defaultparameter
+            - Korrekte Darstellung des Bildes an der richtigen Stelle
 
         Args:
             image (Image): The image to draw
@@ -252,9 +298,13 @@ class Game:
 
         surface.blit(image.getImage(), position)
 
-    def drawMenu(self, menu=None):
+    def drawMenu(self, menu=None) -> None:
         """
         This method draws a given menu to the screen. Default menu is the pause menu
+
+        Tests:
+            - Darstellung des richtigen Menüs
+            - Keine Fehler beim Zeichnen und Updaten des Menüs
 
         Args:
             menu (pygame_menu.Menu): The menu to draw
@@ -268,18 +318,27 @@ class Game:
             menu.update(self.events)
             menu.draw(self.surface)
 
-    def togglePause(self):
+    def togglePause(self) -> None:
         """
         This method toggles self.isPaused and is called once the user pressed the ESC-key.
+
+        Tests:
+            - Toggle der Variable immer fehlerlos
+            - Immer korrekt aufgerufen
 
         Returns: None
         """
 
         self.isPaused = not self.isPaused
 
-    def toggleFullscreen(self, *args):
+    def toggleFullscreen(self, *args) -> None:
         """
         This method toggles pygame fullscreen.
+
+        Tests:
+            - Toggle der Variable immer fehlerlos
+            - Wird Fullscreen unterstützt:
+            https://www.pygame.org/docs/ref/display.html#pygame.display.toggle_fullscreen
 
         Args:
             args: Optional. Only needed to satisfy pygame-menu requirements.
@@ -290,9 +349,13 @@ class Game:
         self.isFullscreen = not self.isFullscreen
         pygame.display.toggle_fullscreen()
 
-    def playSound(self, sound, volume=1.0):
+    def playSound(self, sound, volume=1.0) -> None:
         """
         This method plays a sound.
+
+        Tests:
+            - Korrekte Wiedergabe des Sounds
+            - Abfangen von fehlerhaften Sounds. (Keine pygame.mixer.Sound Objekte)
 
         Args:
             sound (str): The name of the sound
@@ -306,10 +369,14 @@ class Game:
             sound.set_volume(volume)
             sound.play()
 
-    def gameOver(self):
+    def gameOver(self) -> None:
         """
         This method is called once the game finished.
         It asks the user to input a name and saves their score afterwards.
+
+        Tests:
+            - Korrektes Anlegen des pandas DataFrame
+            - Korrektes Abfangen von Fehlern
 
         Returns: None
         """
@@ -348,6 +415,10 @@ class Game:
         This method shows an input dialog for the user to write their name.
         The name will be used in the scoreboard.
 
+        Tests:
+            - Name wird vom TextInput korrekt zurückgegeben
+            - Darstellung mit richtigem Hintergrund
+
         Returns: The name of the user as a string
         """
 
@@ -374,9 +445,15 @@ class Game:
 
         return nameInput.get_text()
 
-    def saveScore(self, values):
+    def saveScore(self, values) -> None:
         """
         This method saves the score of the user in a game
+
+        Tests:
+            - Übergebener Parameter ist ein DataFrame
+            - Richtiges Summieren der Wins
+            - Korrekte Sortierung des DataFrames
+            - Schreiben der CSV-Datei korrekt
 
         Args:
             values (DataFrame): The data to be appended to the dataframe. It contains the player name and other
@@ -390,8 +467,8 @@ class Game:
 
             # Sum wins grouped by Player
             if Configuration.WIN_HEADER in self.scores.columns:
-                self.scores = self.scores.\
-                    groupby(Configuration.PLAYER_HEADER, as_index=False)[Configuration.WIN_HEADER].\
+                self.scores = self.scores. \
+                    groupby(Configuration.PLAYER_HEADER, as_index=False)[Configuration.WIN_HEADER]. \
                     sum()
 
             # Sort the DataFrame
@@ -416,10 +493,14 @@ class Game:
             Configuration.SCORE_DATA[self.game] = self.scores
             Configuration.UPDATE_GAME_SCORE = self.game
 
-    def setGameOverText(self, text: str):
+    def setGameOverText(self, text) -> None:
         """
         This function generates a gameover text when a player has won or lost that will be displayed on the endscreen.
         It internally sets the attribute gameOverText.
+
+        Tests:
+            - Übergebener Text ist ein valider String
+            - Variable wird korrekt gesetzt
 
         Args:
             text (str): the text that will be displayed on the endscreen
@@ -427,10 +508,14 @@ class Game:
 
         self.gameOverText = text
 
-    def quit(self):
+    def quit(self) -> None:
         """
         This method is called once the player quits the game.
-        It also stops the background music
+        It also stops the background music.
+
+        Tests:
+            - Musik wird ohne Probleme gestoppt
+            - Variable wird korrekt gesetzt
         """
 
         pygame.mixer.music.stop()
@@ -444,12 +529,17 @@ class GameContainer(Game):
         Children of class Game.
 
         This class displays the main menu adding the ability to start games and adjust settings.
+
+        Tests:
+            - Korrektes Anlegen der Menüs
+            - Bedienung der Menüs ohne Fehler und Bugs möglich
         """
+
         super().__init__()
 
         # Disable the score display
         self.hasScore = False
-        
+
         # Create menus
         # https://pygame-menu.readthedocs.io/en/4.0.7/index.html
         self.mainMenu = pygame_menu.Menu(
@@ -530,50 +620,98 @@ class GameContainer(Game):
         # Run the container
         self.run()
 
-    def updateScreen(self):
+    def updateScreen(self) -> None:
+        """
+        This method draws the main menu of the application.
+
+        Tests:
+            - Darstellung des richtigen Menüs
+            - Variablen alle korrekt initialisiert
+
+        Returns: None
+        """
+
         # Draw the main menu
         self.drawMenu(self.mainMenu)
 
         super().updateScreen()
 
     @staticmethod
-    def startSnake():
+    def startSnake() -> None:
         """
         This function starts the Snake-Game
+
+        Tests:
+            - Spiel wird korrekt gestartet
+            - Programmfluss wird korrekt weitergeführt
+
+        Returns: None
         """
 
         from games.Snake import Snake
         Snake()
 
     @staticmethod
-    def startTTT():
+    def startTTT() -> None:
         """
         This function starts the TicTacToe-Game
+
+        Tests:
+            - Spiel wird korrekt gestartet
+            - Programmfluss wird korrekt weitergeführt
+
+        Returns: None
         """
 
         from games.TicTacToe import TicTacToe
         TicTacToe()
 
     @staticmethod
-    def startPongMultiplayer():
+    def startPongMultiplayer() -> None:
         """
         This functions starts the Pong-Game with two players
+
+        Tests:
+            - Spiel wird korrekt gestartet
+            - Spieler spielt nicht gegen einen Computer
+
+        Returns: None
         """
 
         from games.Pong import Pong
         Pong(False)
 
     @staticmethod
-    def startPongComputer():
+    def startPongComputer() -> None:
         """
         This functions starts the Pong-Game with a computer player
+
+        Tests:
+            - Spiel wird korrekt gestartet
+            - Spieler spielt gegen einen Computer
+
+        Returns: None
         """
 
         from games.Pong import Pong
         Pong(True)
 
-    def toggleFullscreen(self, *args):
-        super().toggleFullscreen()
+    def toggleFullscreen(self, *args) -> None:
+        """
+        This method toggles fullscreen and also updates the fullscreen switch in the options menu
+
+        Tests:
+            - Spielfenster wechselt korrekt in den Fullscreen oder zurück in den Fenstermodus
+            - self.isFullscreen spiegelt immer korrekt den Stand des Fensters wieder
+            - Toggle-Switch spiegelt immer den aktuellen Stand des Fensters  wieder
+
+        Args:
+            args: Optional. Only needed to satisfy pygame-menu requirements.
+
+        Returns: None
+        """
+
+        super().toggleFullscreen(args)
 
         # Update the value of the menu widget and force render the menu
         toggle = self.optionsMenu.get_widget("fullscreen")
@@ -582,9 +720,14 @@ class GameContainer(Game):
             toggle.set_value(self.isFullscreen)
             self.mainMenu.render()
 
-    def updateScoreTable(self, selectValue, *args):
+    def updateScoreTable(self, selectValue, *args) -> None:
         """
         This method updates the table displaying the scores in the highscore menu.
+
+        Tests:
+            - Übergebener Parameter enthält das ausgewählte Spiel
+            - Korrekter DataFrame wird ausgewählt
+            - Tabelle spiegelt genau den DataFrame wieder
 
         Args:
             selectValue (tuple[tuple[str, str], int]): The value of the dropdown select
@@ -642,10 +785,14 @@ class GameContainer(Game):
                 )
                 self.highscoreMenu.move_widget_index(label, 1)
 
-    def refreshScoreTable(self, widget, menu):
+    def refreshScoreTable(self, widget, menu) -> None:
         """
         This method is a draw callback from the highscore table meaning it is called every time the score table is
         drawn. This is needed to update the table after a new score was set and the widget wasn't reloaded.
+
+        Tests:
+            - Methode wird immer korrekt aufgerufen -> Callback funktioniert
+            - Refresh wird nur unter den richtigen Bedingungen getriggert
 
         Args:
             widget (pygame_menu.widgets.core.widget.Widget): The widget that was drawn. In this case it is the table
@@ -668,6 +815,10 @@ class GameContainer(Game):
         """
         This method returns the game of a given dropdown select value.
 
+        Tests:
+            - Übergebener Parameter enthält das Spiel
+            - Spiel wird korrekt zurückgegeben
+
         Args:
             selectValue (tuple[tuple[str, str], int]): The value of the dropdown select
 
@@ -676,9 +827,13 @@ class GameContainer(Game):
 
         return selectValue[0][0]
 
-    def quit(self):
+    def quit(self) -> None:
         """
         This method quits the application.
+
+        Tests:
+            - Applikation wird ohne Fehler beendet
+            - Rückgabecode wird korrekt übergeben
         """
 
         pygame.quit()
@@ -690,6 +845,10 @@ class Image(pygame.sprite.Sprite):
         """
         This class represents a image in a game. This can be a texture, character, etc.
         It's parent is pygame.sprite.Sprite
+
+        Tests:
+            - Bild wird korrekt geladen
+            - Variablen werden korrekt gesetzt
 
         Args:
             x (int): The position on the screen on the x-axis
@@ -720,6 +879,10 @@ class Image(pygame.sprite.Sprite):
         """
         This method returns the most left x value of the image
 
+        Tests:
+            - Variable wird korrekt zurückgegeben
+            - Variable spiegelt genau den Wert der x-Koordinate wieder
+
         Returns: x-coordinate of the image
         """
 
@@ -728,6 +891,10 @@ class Image(pygame.sprite.Sprite):
     def setX(self, x) -> None:
         """
         This method moves the image to the given value on the x-axis
+
+        Tests:
+            - Variable wird korrekt gesetzt
+            - Übergebener Parameter ist eine Ganzzahl
 
         Args:
             x (int): The x-coordinate to move the image to
@@ -741,6 +908,10 @@ class Image(pygame.sprite.Sprite):
         """
         This method returns the y-axis value of the image
 
+        Tests:
+            - Variable wird korrekt zurückgegeben
+            - Variable spiegelt genau den Wert der x-Koordinate wieder
+
         Returns: y-coordinate of the image
         """
 
@@ -749,6 +920,10 @@ class Image(pygame.sprite.Sprite):
     def setY(self, y) -> None:
         """
         This method moves the image to the given value on the y-axis
+
+        Tests:
+            - Variable wird korrekt gesetzt
+            - Übergebener Parameter ist eine Ganzzahl
 
         Args:
             y (int): The y-coordinate to move the image to
@@ -762,14 +937,22 @@ class Image(pygame.sprite.Sprite):
         """
         This method returns the rect of the image.
 
+        Tests:
+            - Variable wird korrekt zurückgegeben
+            - Variable spiegelt genau den Wert der Bildumrisse wieder
+
         Returns: The rect of the image
         """
 
         return self.rect
 
-    def setRect(self, rect):
+    def setRect(self, rect) -> None:
         """
         This method updates the rect of the image.
+
+        Tests:
+            - Variable wird korrekt gesetzt
+            - Übergebener Parameter ist ein gültiges Rechteck
 
         Args:
             rect (pygame.rect.Rect): The new rect object
@@ -783,14 +966,22 @@ class Image(pygame.sprite.Sprite):
         """
         This method returns the image surface of the image.
 
+        Tests:
+            - Variable wird korrekt zurückgegeben
+            - Variable enthält das Bild der Klasse
+
         Returns: The image surface of the image
         """
 
         return self.image
 
-    def setImage(self, image):
+    def setImage(self, image) -> None:
         """
         This method updates the image of the image.
+
+        Tests:
+            - Variable wird korrekt gesetzt
+            - Übergebener Parameter ist ein gültiges Bild
 
         Args:
             image (pygame.surface.Surface): The new image surface
