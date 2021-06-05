@@ -81,7 +81,6 @@ class Pong(Game):
             hasColorkey=False
         )
 
-
         # render the pregame animation screen
         self.preGameScreen()
 
@@ -234,8 +233,8 @@ class Pong(Game):
 
         # collision handling of the ball
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
-            self.ball.flip_velocity(mode="x")  # flip velocity vector on x-axis
-            self.playSound("player_collision", 0.6)
+            if self.ball.flip_velocity(mode="x"):  # flip velocity vector on x-axis
+                self.playSound("player_collision", 0.6)
 
             # change the sensitivity and speed of the computer player every bounce to make the game more interesting
             if self.hasComputerPlayer:
@@ -396,8 +395,8 @@ class Player(Image):
             None
         """
 
-        self.sensitivity = randint(30, 90)
-        self.speed = randint(6, 12)
+        self.sensitivity = randint(20, 70)
+        self.speed = randint(7, 12)
 
 
 class Ball(Image):
@@ -414,6 +413,9 @@ class Ball(Image):
 
         # speed
         self.speed = self.getRandomVelocity()
+
+        #
+        self.lastFlip = time()
 
     def didCollideWithPlayer(self, player: Player):
         """
@@ -441,7 +443,7 @@ class Ball(Image):
         y_coord = self.getY()
         return y_coord < 0 or (y_coord + self.ball_size[1]) > Configuration.windowHeight
 
-    def flip_velocity(self, mode="x"):
+    def flip_velocity(self, mode="x") -> bool:
         """
         This function flips the velocity vector of the ball.
 
@@ -450,13 +452,20 @@ class Ball(Image):
             on the x- axis (1,1) -> ( 1,-1). When mode is y, it flips the velocity on the y- axis (1,1) -> (-1, 1).
 
         Return:
-            None
+            True, when the velocity has been flipped, if not, false
         """
 
-        if mode == "x":
-            self.speed = (-self.speed[0], self.speed[1])
-        elif mode == "y":
-            self.speed = (self.speed[0], -self.speed[1])
+        currentTime = time()
+
+        if (currentTime - self.lastFlip) > 0.2:
+            if mode == "x":
+                self.speed = (-self.speed[0], self.speed[1])
+            elif mode == "y":
+                self.speed = (self.speed[0], -self.speed[1])
+            self.lastFlip = currentTime
+            return True
+
+        return False
 
     def move(self):
         """
@@ -507,7 +516,7 @@ class Ball(Image):
             (Integer, Integer)
         """
 
-        v_x, v_y = randint(5, 15), randint(5, 7)
+        v_x, v_y = randint(9, 15), randint(5, 8)
         pos_or_negativ = np.random.randint(2, size=2)  # 1 --> negative sign, 0 --> positive sign
 
         if pos_or_negativ[0]:
