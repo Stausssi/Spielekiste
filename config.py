@@ -65,7 +65,6 @@ class Configuration:
 
                 frame = pandas.DataFrame(data=dataDict)
 
-        print(frame)
         SCORE_DATA.update({
             game: frame
         })
