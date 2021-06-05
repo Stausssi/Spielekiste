@@ -257,11 +257,11 @@ class Pong(Game):
         self.player_one = Player(100, 50)
         self.player_two = Player(Configuration.windowWidth - 100, 50)
 
+        # Ball Setup
         self.ball = Ball(Configuration.windowWidth / 2, Configuration.windowHeight / 2)
 
         # counter
         self._score = [0, 0]
-        self._font = pygame.font.Font('freesansbold.ttf', 32)
         self.startTime = time()  # time of the game start --> is used to calculate a score
 
         # calculate the number of spacers by windowheight
@@ -302,7 +302,7 @@ class Pong(Game):
         self.surface.fill((0, 0, 0))
         self.drawImageOnSurface(logo)
         self.drawImageOnSurface(keys_player_one)
-        if not self.hasComputerPlayer: # only draw the control of the second player, if he isn´t a computer player
+        if not self.hasComputerPlayer:  # only draw the control of the second player, if he isn´t a computer player
             self.drawImageOnSurface(keys_player_two)
         self.drawTextOnSurface("First player that reaches 1000 points wins!",
                                (Configuration.windowWidth / 2, Configuration.windowHeight / 2), Colors.ByteGreen,
@@ -314,6 +314,28 @@ class Pong(Game):
 
         super().updateScreen()  # display images on screen
         sleep(4)  # wait for seconds
+
+    def startGameOverScreen(self, player: int):
+        """
+        This function calculates the score of the winning player and start the gameover screen. The screen contains
+        a specific text and the players score, it is set by calling the method setGameOverText().
+
+        Args:
+            player(Int): the player, that has won the game: 1 --> Player_one, 2 --> Player_two
+        """
+
+        # calculate the score of the player based on the time it took to win
+        endTime = time()
+        score = int(
+            10000 // (endTime - self.startTime))  # the faster a player wins, the more points he gets
+
+        # TODO -->  exchange for log
+        print(f"Player {player} has won!")
+
+        # generate gameover text
+        self.setGameOverText(f"Player {player} has won! Score: {score}")
+        self.isGameOver = True  # set isGameOver, so that the game over Screen is started
+        self.isRunning = False # stop the execution of the Game
 
     def updateScore(self, player: int) -> None:
         """
@@ -344,7 +366,7 @@ class Pong(Game):
         """
 
         # event handling
-        # Handle keydown events
+        # Handle keydown events and sets movements flags accordingly
         if event.type == pygame.KEYDOWN:
 
             # player_one
@@ -355,28 +377,31 @@ class Pong(Game):
             if event.key == pygame.K_d:
                 self.player_one.move_down = True
 
-            # player_two
+            # player_two, allow movements only, if player two is no computer player
             if not self.hasComputerPlayer:
+                # move up with left arrow key
                 if event.key == pygame.K_LEFT:
                     self.player_two.move_up = True
-                    # Move down with D Key
+                # Move down with right arrow key
                 if event.key == pygame.K_RIGHT:
                     self.player_two.move_down = True
 
         # Handle keyup events
         if event.type == pygame.KEYUP:
-            # Move up with A Key
+            # player one movement
+            # Stop moving up
             if event.key == pygame.K_a:
                 self.player_one.move_up = False
-            # Move down with D Key
+            # Stop moving down
             if event.key == pygame.K_d:
                 self.player_one.move_down = False
 
-            # player_two
+            # player_two, allow movements only, if player two is no computer player
             if not self.hasComputerPlayer:
+                # Stop moving up
                 if event.key == pygame.K_LEFT:
                     self.player_two.move_up = False
-                    # Move down with D Key
+                    # Stop moving down
                 if event.key == pygame.K_RIGHT:
                     self.player_two.move_down = False
 
@@ -397,7 +422,7 @@ class Pong(Game):
         else:
             self.player_two.move()
 
-        # collision handling
+        # collision handling of the ball
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
             self.ball.flip_velocity(mode="x")  # flip velocity vector on x-axis
 
@@ -409,36 +434,20 @@ class Pong(Game):
             self.ball.flip_velocity(mode="y")  # flip velocity vector on y-axis
 
         # determine winner of the round
-        winner = self.ball.determine_round_winner()
-        if winner:
-
-            # calculate the score of the player based on the time it took to win
-            endTime = time()
-            score = int(10000 // (endTime - self.startTime))  # the faster a player wins, the more points he gets
-
-            if winner == 1:
+        round_winner = self.ball.determine_round_winner()
+        if round_winner:
+            if round_winner == 1:
                 # increase player one score
                 self.updateScore(1)
                 # determine, if the player has won 5 rounds
                 if self._score[0] == 5:
-                    # TODO -->  exchange for log
-                    print("Player one has won!")
-                    # generate gameover text
-                    self.setGameOverText(f"Player 1 has won! Score: {score}")
-                    self.isGameOver = True  # set isGameOver, so that the game over Screen is started
-                    self.isRunning = False
-
-            elif winner == 2:
+                    self.startGameOverScreen(1)
+            elif round_winner == 2:
                 # increase player two score
                 self.updateScore(2)
                 # determine, if the player has won 5 rounds
                 if self._score[1] == 5:
-                    # TODO -->  exchange for log
-                    print("Player two has won!")
-                    # generate gameover text
-                    self.setGameOverText(f"Player 2 has won! Score: {score}")
-                    self.isGameOver = True  # set isGameOver, so that the game over Screen is started
-                    self.isRunning = False
+                    self.startGameOverScreen(2)
 
             self.ball.reset()  # reset the velocity and position of the ball
 
