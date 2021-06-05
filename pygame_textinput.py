@@ -17,6 +17,7 @@ class TextInput:
     This class let's the user input a short, one-lines piece of text at a blinking cursor
     that can be moved using the arrow-keys. Delete, home and end work as well.
     """
+
     def __init__(
             self,
             initial_string="",
@@ -80,21 +81,21 @@ class TextInput:
 
                 # If none exist, create counter for that key:
                 if event.key not in self.keyrepeat_counters:
-                    if not event.key == pl.K_RETURN: # Filters out return key, others can be added as necessary
+                    if not event.key == pl.K_RETURN:  # Filters out return key, others can be added as necessary
                         self.keyrepeat_counters[event.key] = [0, event.unicode]
 
                 if event.key == pl.K_BACKSPACE:
                     self.input_string = (
-                        self.input_string[:max(self.cursor_position - 1, 0)]
-                        + self.input_string[self.cursor_position:]
+                            self.input_string[:max(self.cursor_position - 1, 0)]
+                            + self.input_string[self.cursor_position:]
                     )
 
                     # Subtract one from cursor_pos, but do not go below zero:
                     self.cursor_position = max(self.cursor_position - 1, 0)
                 elif event.key == pl.K_DELETE:
                     self.input_string = (
-                        self.input_string[:self.cursor_position]
-                        + self.input_string[self.cursor_position + 1:]
+                            self.input_string[:self.cursor_position]
+                            + self.input_string[self.cursor_position + 1:]
                     )
 
                 elif event.key == pl.K_RETURN:
@@ -117,9 +118,9 @@ class TextInput:
                 elif len(self.input_string) < self.max_string_length or self.max_string_length == -1:
                     # If no special key is pressed, add unicode of key to input_string
                     self.input_string = (
-                        self.input_string[:self.cursor_position]
-                        + event.unicode
-                        + self.input_string[self.cursor_position:]
+                            self.input_string[:self.cursor_position]
+                            + event.unicode
+                            + self.input_string[self.cursor_position:]
                     )
                     self.cursor_position += len(event.unicode)  # Some are empty, e.g. K_UP
 
@@ -135,8 +136,8 @@ class TextInput:
             # Generate new key events if enough time has passed:
             if self.keyrepeat_counters[key][0] >= self.keyrepeat_intial_interval_ms:
                 self.keyrepeat_counters[key][0] = (
-                    self.keyrepeat_intial_interval_ms
-                    - self.keyrepeat_interval_ms
+                        self.keyrepeat_intial_interval_ms
+                        - self.keyrepeat_interval_ms
                 )
 
                 event_key, event_unicode = key, self.keyrepeat_counters[key][1]
@@ -182,7 +183,6 @@ class TextInput:
     def clear_text(self):
         self.input_string = ""
         self.cursor_position = 0
-
 
 
 if __name__ == "__main__":

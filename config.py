@@ -4,7 +4,7 @@ from pandas import DataFrame
 
 class Configuration:
     """
-    A static configuration class containing the most important values, such as windows size, etc.
+    A static configuration class containing the most important values, such as window size, etc.
     """
 
     windowWidth, windowHeight = 1920, 1080
@@ -55,3 +55,4 @@ class Colors:
     Green = (0, 150, 0)
     Red = (255, 0, 0)
     DarkRed = (150, 0, 0)
+    ByteGreen = (11, 162, 12)
