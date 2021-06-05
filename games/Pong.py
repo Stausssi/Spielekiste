@@ -26,7 +26,7 @@ class Player(Image):
 
         # image from: https://www.bienenfisch-design.de/produkt/bits-and-bytes/
         # and edited
-        super().__init__(x, y, self.player_size, "plane.png")
+        super().__init__(x, y, self.player_size, "plane.png", pathToImage="images/Pong/")
 
         # movement flags --> These determine in which direction the player is moved,
         # when move() is called
@@ -126,7 +126,7 @@ class Ball(Image):
     def __init__(self, x, y):
         self.ball_size = (30, 30)
         # image was edited on my own
-        super().__init__(x, y, self.ball_size, "ballbyte.png")
+        super().__init__(x, y, self.ball_size, "ballbyte.png", pathToImage="images/Pong/")
 
         # speed
         self.speed = self.getRandomVelocity()
@@ -270,7 +270,8 @@ class Pong(Game):
         self.spacers = list()
         for i in range(number_of_spacers):
             # image was edited on my own
-            self.spacers.append(Image(Configuration.windowWidth / 2, 40 * i, (10, 30), "spacer.png"))
+            self.spacers.append(
+                Image(Configuration.windowWidth / 2, 40 * i, (10, 30), "spacer.png", pathToImage="images/Pong/"))
 
         # render the pregame animation screen
 
@@ -290,13 +291,13 @@ class Pong(Game):
         # load all images
         # created with: https://de.flamingtext.com/Free-Logo-Designs/
         logo = Image(Configuration.windowWidth / 2 - 750 / 2, Configuration.windowHeight / 4 - 120 / 2, (750, 120),
-                     "PongLogo.png")
+                     "PongLogo.png", pathToImage="images/Pong/")
         keys_player_one = Image(Configuration.windowWidth / 4 - 150, Configuration.windowHeight * 3 / 4 - 50,
                                 (300, 100),
-                                "AandD.png")
+                                "AandD.png" ,pathToImage="images/Pong/")
         keys_player_two = Image(Configuration.windowWidth * 3 / 4 - 150, Configuration.windowHeight * 3 / 4 - 50,
                                 (300, 100),
-                                "ArrowLeftRight.png")
+                                "ArrowLeftRight.png", pathToImage="images/Pong/")
 
         # draw text and images
         self.surface.fill((0, 0, 0))
@@ -335,7 +336,7 @@ class Pong(Game):
         # generate gameover text
         self.setGameOverText(f"Player {player} has won! Score: {score}")
         self.isGameOver = True  # set isGameOver, so that the game over Screen is started
-        self.isRunning = False # stop the execution of the Game
+        self.isRunning = False  # stop the execution of the Game
 
     def updateScore(self, player: int) -> None:
         """
