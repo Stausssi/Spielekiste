@@ -1,9 +1,22 @@
+"""
+    file: config.py
+    description: Contains constants (Configuration and Colors) for the application.
+
+    author: Niklas Drössler, Simon Stauss
+    date: 14.04.2021
+    licence: free
+"""
+
 import pandas
 
 
 class Configuration:
     """
     A static configuration class containing the most important values, such as window size, etc.
+
+    Tests:
+        - Variablen werden korrekt angelegt
+        - DataFrame wird korrekt aus der CSV gelesen
     """
 
     windowWidth, windowHeight = 1920, 1080
@@ -50,6 +63,14 @@ class Configuration:
 
 
 class Colors:
+    """
+    A static class containing constants of tuples containing the RGB values of a color.
+
+    Tests:
+        - Farben alle korrekt definiert
+        - Werte werden korrekt abgerufen
+    """
+
     White = (255, 255, 255)
     Black = (0, 0, 0)
     VeryLightGreen = (0, 255, 0)
