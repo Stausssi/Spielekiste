@@ -341,7 +341,6 @@ class Game:
 
             self.saveScore(DataFrame(data=values))
 
-        self.saveScore(name)
         self.gameOverText = ""  # clear gameover text
 
     def getUserName(self) -> str:
