@@ -1,3 +1,12 @@
+"""
+    file: Snake.py
+    description: Contains everything needed to play snake.
+
+    author: Simon Stauss
+    date: 15.05.2021
+    licence: free
+"""
+
 import random
 import pygame
 from enum import IntEnum
@@ -18,6 +27,10 @@ class Snake(Game):
 
         Fruits (food) are from Victor Stambert:
         https://veo_the_artist.artstation.com/projects/oOYoDq
+
+        Tests:
+            - Variablen korrekt angelegt und überschrieben
+            - Berechnung alle fehlerfrei
         """
 
         super().__init__(game=Configuration.GAME_SNAKE)
@@ -95,7 +108,20 @@ class Snake(Game):
         # Start the game
         self.run()
 
-    def handleEvent(self, event):
+    def handleEvent(self, event) -> None:
+        """
+        This method handles the snake specific events, such as controlling the snake by key presses.
+
+        Tests:
+            - Nur bestimmte Events werden beachtet
+            - Korrekte Reaktion auf die jeweiligen Events
+
+        Args:
+            event (pygame.event.Event): The to be handled event
+
+        Returns: None
+        """
+
         # Only react to keydown if snake is allowed to move
         if event.type == pygame.KEYDOWN and self.allowMove:
             self.allowMove = False
@@ -112,7 +138,17 @@ class Snake(Game):
             else:
                 self.allowMove = True
 
-    def updateScreen(self):
+    def updateScreen(self) -> None:
+        """
+        This methods handles the drawing of elements on the screen.
+
+        Tests:
+            - Alle Elemente sind vorhanden und werden an die richtigen Stellen gezeichnet
+            - Reihenfolge beim Zeichnen der Elemente wird eingehalten -> Keine Überlappungen
+
+        Returns: None
+        """
+
         # Draw checkers background
         size = Configuration.SNAKE_TILE_SIZE
         for x in range(self.startX, self.startX + self.width, size):
@@ -139,9 +175,19 @@ class Snake(Game):
 
         super().updateScreen()
 
-    def updateGameState(self):
+    def updateGameState(self) -> None:
+        """
+        This method updates the snake at a configured speed.
+
+        Tests:
+            - Überprüfen auf Logikfehler
+            - Werte aus Konfiguration korrekt gelesen
+
+        Returns: None
+        """
+
         if not self.isGameOver:
-            # Update the position of the tiles if enough ticks passed, specified by self.speed
+            # Update the position of the tiles if enough ticks passed, specified in the Configuration class
             # Also check for food and eat if there is any
             if self.tickCounter % Configuration.SNAKE_SPEED == 0 and not self.hasDied:
                 self.updateSnakeTiles()
@@ -150,10 +196,15 @@ class Snake(Game):
             # Increase the tick counter
             self.tickCounter += 1
 
-    def updateSnakeTiles(self):
+    def updateSnakeTiles(self) -> None:
         """
         This method updates every tile of the snake while also checking for collisions and rotating the tiles
         correspondingly.
+
+        Tests:
+            - Schlange bewegt sich immer in die richtige Richtung
+            - Bilder werden korrekt rotiert und ausgetauscht
+            - Korrektes Aktualisieren des SnakeTiles-Arrays
 
         Returns: None
         """
@@ -234,6 +285,11 @@ class Snake(Game):
         """
         This method checks whether the head of the snake is allowed to move on to the new field.
 
+        Tests:
+            - Übergebene Parameter sind im korrekten Wertebereich
+            - Keine Logikfehler
+            - Edge-Cases
+
         Args:
             x (int): The x coordinate of the new field
             y (int): The y coordinate of the new field
@@ -257,10 +313,14 @@ class Snake(Game):
 
         return noIntersect and inBounds
 
-    def eatFood(self):
+    def eatFood(self) -> None:
         """
         This method checks whether the head of the snake is on top of a food item. If that's the case, the food will be
         consumed by the snake and thus increasing the score and speed. A new food item will be spawned randomly.
+
+        Tests:
+            - Überprüfung auf Überlappung der Felder immer richtig
+            - Einfügen eines neuen SnakeTiles an der richtigen Stelle
 
         Returns: None
         """
@@ -284,9 +344,14 @@ class Snake(Game):
 
             self.foodEaten = True
 
-    def updateFood(self):
+    def updateFood(self) -> None:
         """
         This method moves a food item to a random location and randomly changes the type of the food.
+
+        Tests:
+            - Neue Position des Essens hat keine Überschneidungen mit der Snake
+            - Variablen werden korrekt gespeichert und gesetzt
+            - Bild wird ohne Fehler aktualisiert
 
         Returns: None
         """
@@ -311,9 +376,13 @@ class Snake(Game):
             pathToImage="images/Snake"
         )
 
-    def animateDeath(self):
+    def animateDeath(self) -> None:
         """
         This method animates the death of the snake by moving the entire body backwards and replacing the head image
+
+        Tests:
+            - Bewegen der Schlange ohne Probleme und Fehler
+            - Edge-Cases: Gerade erst gegessen? Alle Ecken zurückgesetzt?
 
         Returns: None
         """
@@ -333,6 +402,10 @@ class Snake(Game):
 class Direction(IntEnum):
     """
     IntEnum class representing the direction (UP, RIGHT, DOWN, LEFT) of a tile in Snake. Merely for cosmetic purposes.
+
+    Tests:
+        - Variablen werden korrekt angelegt
+        - Variablen werden korrekt zurückgegeben
     """
 
     UP = 0
@@ -346,6 +419,10 @@ class SnakeTile(Image):
         """
         A SnakeTile represents a tile-fragment of the snake. There is always a head tile, at least two body tiles and a
         tail tile.
+
+        Tests:
+            - tileType nur einer der gültigen Möglichkeiten
+            - Bild wird richtig angelegt
 
         Args:
             x (int): The x position where the tile is to be placed on the screen
@@ -399,6 +476,10 @@ class SnakeTile(Image):
         This method deepcopies a snake tile and is used for increasing the length of the snake after eating food and
         saving the previous state of the tile
 
+        Tests:
+            - Alle Variablen werden korrekt gesetzt
+            - Zurückgegebener Wert ist eine Kopie der SnakeTile
+
         Returns (SnakeTile): A new SnakeTile object exactly the same as the current object
         """
 
@@ -414,9 +495,13 @@ class SnakeTile(Image):
 
         return cloneTile
 
-    def move(self, rect, direction):
+    def move(self, rect, direction) -> None:
         """
         Moves the tile to a given position and facing in a specific direction.
+
+        Tests:
+            - Bewegung wird an die korrekte Stelle durchgeführt
+            - Übergabeparameter gültig? (auf dem Spielfeld und Richtung aus dem Enum)
 
         Args:
             rect (pygame.rect.Rect): The position to move the tile to
@@ -432,14 +517,22 @@ class SnakeTile(Image):
         """
         Get the previous state of the tile
 
+        Tests:
+            - Zurückgegebener Wert ist eine SnakeTiles Instanz
+            - prevState spiegelt tatsächlich den vorherigen Stand wieder
+
         Returns (SnakeTile): A SnakeTile representing the previous state
         """
 
         return self.prevState
 
-    def saveState(self):
+    def saveState(self) -> None:
         """
         This method saves a copy of the element to the prevState variable.
+
+        Tests:
+            - Kopie wird ohne Fehler erzeugt
+            - Variable wird korrekt gesetzt
 
         Returns: None
         """
@@ -450,14 +543,22 @@ class SnakeTile(Image):
         """
         Get the direction the tile is facing.
 
+        Tests:
+            - Wert wird korrekt zurückgegeben
+            - Variable spiegelt wirklich Richtung des SnakeTile wieder
+
         Returns: The direction of the snake tile
         """
 
         return self.direction
 
-    def setDirection(self, direction):
+    def setDirection(self, direction) -> None:
         """
         Update the direction of a tile. Also rotates the image to fit the direction.
+
+        Tests:
+            - Variable wird korrekt gesetzt
+            - Übergebene Richtung ist valide
 
         Args:
             direction (Direction): The new direction
@@ -477,6 +578,10 @@ class SnakeTile(Image):
     def getRotateTile(self, newDirection) -> int:
         """
         Returns the direction of the the rotate depending on the new direction.
+
+        Tests:
+            - Wert wird korrekt zurückgegeben
+            - Berechnung ergibt immer das selbe
 
         Args:
             newDirection (Direction): The direction the tile will be facing next
@@ -507,9 +612,13 @@ class SnakeTile(Image):
         else:
             return 0
 
-    def rotateTile(self, rotation):
+    def rotateTile(self, rotation) -> None:
         """
         Rotate the image of a tile.
+
+        Tests:
+            - Rotation wird korrekt durchgeführt
+            - Variablen werden überschrieben
 
         Args:
             rotation (int): The direction of the rotation: 1 -> rotate left, -1 -> rotate right
@@ -524,6 +633,10 @@ class SnakeTile(Image):
         """
         Get the numerical difference of the current and a new direction.
 
+        Tests:
+            - Übergebener Parameter ist gültig
+            - Berechnung ergibt für die gleichen Parameter immer das selbe Ergebnis
+
         Args:
             newDirection (Direction): The direction to be subtracted with
 
@@ -536,6 +649,10 @@ class SnakeTile(Image):
         """
         Replace the image of a body tile with the corner image. Also handle rotation and horizontal mirroring of the
         image.
+
+        Tests:
+            - Bild wird richtig rotiert und gespiegelt
+            - Übergebene Parameter sind gültig
 
         Args:
             angle (int): The angle to rotate the image by
