@@ -86,9 +86,10 @@ class Game:
     def run(self):
         """
         Main loop of the application.
-        Starts by playing the background music, if it exists.
         Calls methods self.updateEvents(), self.updateGameState() and self.updateScreen() while self.isRunning is True.
         If self.isRunning is False, self.gameOver() will be called to ask the user for their name.
+        
+        !DO NOT OVERWRITE THIS METHOD!
 
         Returns: None
         """
@@ -121,6 +122,8 @@ class Game:
         """
         This functions gets every pygame event and handles quit and pause.
         Unhandled Events are passed down to self.handleEvent() to be handled by children classes.
+
+        !DO NOT OVERWRITE THIS METHOD!
 
         Args:
             nameInput (bool): Specifies whether the game is currently waiting for the user to input their name
@@ -156,7 +159,7 @@ class Game:
     def handleEvent(self, event):
         """
         This method specifies game-specific behavior on pygame events.
-        It is to be implemented by the children classes.
+        Overwrite this method in your class!
 
         Args:
             event (pygame.event.Event): The to be handled event
@@ -677,7 +680,7 @@ class Image(pygame.sprite.Sprite):
         Returns: None
         """
 
-        self.rect = rect
+        self.rect = pygame.rect.Rect(rect)
 
     def getImage(self) -> pygame.surface.Surface:
         """

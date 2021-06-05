@@ -11,7 +11,7 @@ class Configuration:
     windowTitle = "Niklas und Simons Spielekiste"
     MUSIC_VOLUME = 0.3
     FRAMERATE = 60
-
+    
     GAME_SNAKE = "Snake"
     GAME_TTT = "TicTacToe"
     GAME_PONG = "Pong"
@@ -42,33 +42,12 @@ class Configuration:
             game: DataFrame(data=data)
         })
 
-    # SCORES = {
-    #     "Snake": DataFrame(
-    #         data={
-    #             SCORES_HEADER["Snake"][0]: None,
-    #             SCORES_HEADER["Snake"][1]: None
-    #         }
-    #     ),
-    #     "TicTacToe": DataFrame(
-    #         data={
-    #             SCORES_HEADER["TicTacToe"][0]: None,
-    #             SCORES_HEADER["TicTacToe"][1]: None
-    #         }
-    #     ),
-    #     "Pong": DataFrame(
-    #         data={
-    #             SCORES_HEADER["Pong"][0]: None,
-    #             SCORES_HEADER["Pong"][1]: None,
-    #             SCORES_HEADER["Pong"][2]: None
-    #         }
-    #     ),
-    #     "Space Invaders": DataFrame(
-    #         data={
-    #             SCORES_HEADER["Space Invaders"][0]: None,
-    #             SCORES_HEADER["Space Invaders"][1]: None
-    #         }
-    #     ),
-    # }
+    # Snake specific constants
+    SNAKE_TILE_SIZE = 50
+    SNAKE_TILES_X = 15
+    SNAKE_TILES_Y = 15
+    SNAKE_SPEED = 15
+    SNAKE_FOOD = ["apple", "cherry", "pear", "strawberry"]
 
 
 class Colors:
