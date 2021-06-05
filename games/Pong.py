@@ -418,7 +418,7 @@ class Pong(Game):
                     print("Player one has won!")
                     # generate gameover text
                     self.setGameOverText(f"Player 1 has won! Score: {score}")
-                    self.isGameOver = True
+                    self.isGameOver = True  # set isGameOver, so that the game over Screen is started
                     self.isRunning = False
 
             elif winner == 2:
@@ -430,7 +430,7 @@ class Pong(Game):
                     print("Player two has won!")
                     # generate gameover text
                     self.setGameOverText(f"Player 2 has won! Score: {score}")
-                    self.isGameOver = True
+                    self.isGameOver = True  # set isGameOver, so that the game over Screen is started
                     self.isRunning = False
 
             self.ball.reset()  # reset the velocity and position of the ball
