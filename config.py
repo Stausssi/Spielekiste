@@ -49,6 +49,9 @@ class Configuration:
     SNAKE_SPEED = 15
     SNAKE_FOOD = ["apple", "cherry", "pear", "strawberry"]
 
+    # TicTacToe
+    TTT_TILE_SIZE = 250
+
 
 class Colors:
     White = (255, 255, 255)

@@ -25,6 +25,7 @@ class Game:
         self.isRunning = True
         self.isGameOver = False
         self.isPaused = False
+        self.showGameOver = False
         self.hasScore = True
         self.score = 0
         self.scoreX, self.scoreY = (windowSize[0] // 2, 100)
@@ -115,7 +116,7 @@ class Game:
             # Target 60 FPS
             self.clock.tick(Configuration.FRAMERATE)
 
-        if self.isGameOver and self.hasScore:
+        if self.isGameOver and (self.hasScore or self.showGameOver):
             self.gameOver()
 
     def updateEvents(self, nameInput=False):
