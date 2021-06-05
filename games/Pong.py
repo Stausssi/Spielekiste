@@ -70,6 +70,18 @@ class Pong(Game):
             "fail": pygame.mixer.Sound("sounds/Pong/fail.wav")
         }
 
+        # set gameover screen settings
+        # load endscreen image
+        self.nameBackground = Image(
+            x=0,
+            y=0,
+            size=Configuration.windowSize,
+            pathToImage="images/Pong/",
+            image="PongEndscreen.png",
+            hasColorkey=False
+        )
+
+
         # render the pregame animation screen
         self.preGameScreen()
 
@@ -223,7 +235,7 @@ class Pong(Game):
         # collision handling of the ball
         if self.ball.didCollideWithPlayer(self.player_one) or self.ball.didCollideWithPlayer(self.player_two):
             self.ball.flip_velocity(mode="x")  # flip velocity vector on x-axis
-            self.playSound("player_collision")
+            self.playSound("player_collision", 0.6)
 
             # change the sensitivity and speed of the computer player every bounce to make the game more interesting
             if self.hasComputerPlayer:
@@ -237,7 +249,7 @@ class Pong(Game):
         round_winner = self.ball.determine_round_winner()
         if round_winner:
 
-            self.playSound("fail")
+            self.playSound("fail", 0.3)
 
             if round_winner == 1:
                 # increase player one score

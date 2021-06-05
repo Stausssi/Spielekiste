@@ -77,7 +77,7 @@ class Game:
 
         self.score = 0
         self.gameOverText = ""  # has to be set by the specific game
-        self.endFont = pygame.font.SysFont("arial", 60)
+        self.endFont = pygame.font.SysFont("arial", 50)
         self.nameSubmit = False
         self.nameInputX, self.nameInputY = (Configuration.windowWidth // 2, Configuration.windowHeight // 2)
         self.nameBackground = Image(
@@ -351,7 +351,7 @@ class Game:
         Returns: The name of the user as a string
         """
 
-        nameInput = TextInput()
+        nameInput = TextInput(text_color=Colors.White, font_family="Arial", font_size=50)
 
         while not self.nameSubmit:
             self.updateEvents(True)
@@ -359,10 +359,11 @@ class Game:
             nameInput.update(self.events)
 
             self.drawImageOnSurface(self.nameBackground)
-            self.surface.blit(nameInput.get_surface(), (self.nameInputX, self.nameInputY))
+            nameSurface = nameInput.get_surface()
+            self.surface.blit(nameSurface, (self.nameInputX + 10, self.nameInputY - nameSurface.get_height() // 2))
             self.drawTextOnSurface(
                 self.gameOverText,
-                (Configuration.windowWidth / 2, Configuration.windowHeight * 1 / 3),
+                (Configuration.windowWidth / 2, Configuration.windowHeight * 5 / 12),
                 Colors.White,
                 font=self.endFont
             )
