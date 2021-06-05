@@ -1,3 +1,6 @@
+from pandas import DataFrame
+
+
 class Configuration:
     """
     A static configuration class containing the most important values, such as windows size, etc.
@@ -8,6 +11,36 @@ class Configuration:
     windowTitle = "Niklas und Simons Spielekiste"
     MUSIC_VOLUME = 0.3
     FRAMERATE = 60
+    
+    GAME_SNAKE = "Snake"
+    GAME_TTT = "TicTacToe"
+    GAME_PONG = "Pong"
+    GAME_SPACE_INVADERS = "Space Invaders"
+
+    # Scores
+    PLAYER_HEADER = "Player"
+    SCORE_HEADER = "Score"
+    WIN_HEADER = "Wins"
+
+    DATA_HEADERS = {
+        GAME_SNAKE: [PLAYER_HEADER, SCORE_HEADER],
+        GAME_TTT: [PLAYER_HEADER, WIN_HEADER],
+        GAME_PONG: [PLAYER_HEADER, WIN_HEADER, SCORE_HEADER],
+        GAME_SPACE_INVADERS: [PLAYER_HEADER, SCORE_HEADER]
+    }
+
+    # Create the score dict containing a dataframe for each game
+    SCORE_DATA = {}
+    for game in DATA_HEADERS.keys():
+        data = {}
+        for dataHeader in DATA_HEADERS[game]:
+            data.update({
+                dataHeader: []
+            })
+
+        SCORE_DATA.update({
+            game: DataFrame(data=data)
+        })
 
     # Snake specific constants
     SNAKE_TILE_SIZE = 50

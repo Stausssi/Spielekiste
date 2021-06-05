@@ -1,13 +1,15 @@
 import os
 import pygame
-import pygame_menu
+from pandas import DataFrame
+
 from pygame_textinput import TextInput
+import pygame_menu
 
 from config import Configuration, Colors
 
 
 class Game:
-    def __init__(self, title=Configuration.windowTitle, windowSize=Configuration.windowSize):
+    def __init__(self, game="", windowSize=Configuration.windowSize):
         """
         Superclass for every component in this application.
 
@@ -15,16 +17,21 @@ class Game:
         modified by the children.
 
         Args:
-            title (str): The title of the pygame window
+            game (str): The name of the game
             windowSize (tuple[int, int]): The size of the pygame window
         """
 
+        self.game = game
         self.isRunning = True
         self.isGameOver = False
         self.isPaused = False
         self.hasScore = True
         self.score = 0
         self.scoreX, self.scoreY = (windowSize[0] // 2, 100)
+        try:
+            self.scores = Configuration.SCORE_DATA[game]
+        except KeyError:
+            self.scores = None
 
         self.windowSize = windowSize
         self.events = None
@@ -35,9 +42,13 @@ class Game:
         pygame.init()
 
         # Display
+        title = Configuration.windowTitle
+        if self.game != "":
+            title += f"| {self.game}"
         pygame.display.set_caption(title)
         self.surface = pygame.display.set_mode(size=self.windowSize)
         self.backgroundImage = None
+        self.isFullscreen = False
 
         # Music
         pygame.mixer.init()
@@ -134,6 +145,8 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     self.togglePause()
                     eventHandled = True
+                elif event.key == pygame.K_F11:
+                    self.toggleFullscreen()
 
                 if nameInput and event.key == pygame.K_RETURN:
                     self.nameSubmit = True
@@ -258,6 +271,19 @@ class Game:
 
         self.isPaused = not self.isPaused
 
+    def toggleFullscreen(self, *args):
+        """
+        This method toggles pygame fullscreen.
+
+        Args:
+            args: Optional. Only needed to satisfy pygame-menu requirements.
+
+        Returns: None
+        """
+
+        self.isFullscreen = not self.isFullscreen
+        pygame.display.toggle_fullscreen()
+
     def playSound(self, sound, volume=1.0):
         """
         This method plays a sound.
@@ -284,7 +310,30 @@ class Game:
 
         # Ask the user for their name to save the score
         name = self.getUserName()
-        self.saveScore(name)
+
+        # Create the values to be saved to the DataFrame
+        values = {
+            Configuration.PLAYER_HEADER: name
+        }
+
+        try:
+            dataHeader = Configuration.DATA_HEADERS[self.game]
+        except KeyError:
+            dataHeader = None
+
+        if dataHeader:
+            for header in dataHeader:
+                if header != Configuration.PLAYER_HEADER:
+                    # Add 1 win or the score
+                    value = 1
+                    if header == Configuration.SCORE_HEADER:
+                        value = self.score
+
+                    values.update({
+                        header: [value]
+                    })
+
+            self.saveScore(DataFrame(data=values))
 
     def getUserName(self) -> str:
         """
@@ -310,18 +359,43 @@ class Game:
 
         return nameInput.get_text()
 
-    def saveScore(self, name):
+    def saveScore(self, values):
         """
         This method saves the score of the user in a game
 
         Args:
-            name (str): The name of the user
+            values (DataFrame): The data to be appended to the dataframe. It contains the player name and other
+                value(s)
 
         Returns: None
         """
 
-        # print(self.score, name)
-        pass
+        if self.scores is not None:
+            self.scores = self.scores.append(values, ignore_index=True)
+
+            # Sum wins grouped by Player
+            if Configuration.WIN_HEADER in self.scores.columns:
+                self.scores = self.scores.\
+                    groupby(Configuration.PLAYER_HEADER, as_index=False)[Configuration.WIN_HEADER].\
+                    sum()
+
+            # Sort the DataFrame
+            # Sort after score by default
+            sortType = Configuration.SCORE_HEADER
+
+            if sortType not in self.scores.columns:
+                # Sort after wins
+                sortType = Configuration.WIN_HEADER
+
+            # Sort the data in a descending order
+            self.scores.sort_values(
+                by=[sortType],
+                ascending=False,
+                inplace=True
+            )
+
+            # Update global scores
+            Configuration.SCORE_DATA[self.game] = self.scores
 
     def quit(self):
         """
@@ -347,7 +421,7 @@ class GameContainer(Game):
         self.hasScore = False
         
         # Create menus
-        # https://pygame-menu.readthedocs.io/en/4.0.1/index.html
+        # https://pygame-menu.readthedocs.io/en/4.0.7/index.html
         self.mainMenu = pygame_menu.Menu(
             title="Herzlich Willkommen in der Spielekiste!",
             width=self.windowSize[0],
@@ -387,9 +461,27 @@ class GameContainer(Game):
         self.playMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to options menu
+        self.optionsMenu.add.toggle_switch(
+            title="Fullscreen",
+            default=self.isFullscreen,
+            onchange=self.toggleFullscreen,
+            toggleswitch_id="fullscreen"
+        )
         self.optionsMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to highscore menu
+        self.highscoreMenu.add.dropselect(
+            title="Game",
+            items=[
+                ("Snake", "Snake"),
+                ("TicTacToe", "TicTacToe"),
+                ("Pong", "Pong"),
+                ("Space Invaders", "Space Invaders")
+            ],
+            placeholder="Select a game",
+            onchange=self.updateScoreTable,
+            margin=(0, 20)
+        )
         self.highscoreMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Quit the game on esc
@@ -439,6 +531,53 @@ class GameContainer(Game):
 
         from games.SpaceInvader import SpaceInvader
         SpaceInvader()
+
+    def toggleFullscreen(self, *args):
+        super().toggleFullscreen()
+
+        # Update the value of the menu widget and force render the menu
+        toggle = self.optionsMenu.get_widget("fullscreen")
+
+        if toggle:
+            toggle.set_value(self.isFullscreen)
+            self.mainMenu.render()
+
+    def updateScoreTable(self, game, *args):
+        """
+        This method updates the table displaying the scores in the highscore menu.
+
+        Args:
+            game (str): The game to get the scores from
+
+        Returns: None
+        """
+        game = game[0][0]
+
+        # https://pygame-menu.readthedocs.io/en/4.0.7/_source/widgets_table.html
+        # Remove table from highscore menu if it exists
+        if self.highscoreMenu.get_widget("scores"):
+            self.highscoreMenu.remove_widget("scores")
+
+        # Create a new table and move it to the correct index
+        table = self.highscoreMenu.add.table(
+            "scores",
+            font_color=Colors.Black,
+            margin=(0, 20)
+        )
+        table.default_cell_padding = 10
+        table.default_row_background_color = Colors.White
+
+        self.highscoreMenu.move_widget_index(table, 1)
+
+        # Add header row
+        table.add_row(
+            cells=Configuration.DATA_HEADERS[game]
+        )
+
+        # TODO: Fill with real data
+        print(Configuration.SCORE_DATA[game])
+        for i in Configuration.SCORE_DATA[game].itertuples():
+            print("Rows:", i)
 
     def quit(self):
         """
