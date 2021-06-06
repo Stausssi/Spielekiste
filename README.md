@@ -3,7 +3,7 @@ Game Container to support multiple arcade games
 
 ## Beschreibung
 Spielekiste mit den Spielen:
-- TicTac Toe 
+- TicTacToe 
 - Pong
 - Snake 
 
