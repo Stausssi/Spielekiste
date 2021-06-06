@@ -10,6 +10,8 @@
 import pygame
 from threading import Timer
 
+from typing import Tuple
+
 from config import Colors, Configuration
 from util import Game, Image
 
@@ -43,6 +45,16 @@ class TicTacToe(Game):
             size=Configuration.windowSize,
             image="background.jpg",
             pathToImage="images/ttt",
+            hasColorkey=False
+        )
+
+        # load endscreen image
+        self.nameBackground = Image(
+            x=0,
+            y=0,
+            size=Configuration.windowSize,
+            pathToImage="images/ttt/",
+            image="TTTEndscreen.png",
             hasColorkey=False
         )
 
@@ -320,7 +332,9 @@ class TTTTile:
 
         return self.player
 
+      
     def getPos(self):
+
         """
         Returns the position of the tile.
         It is needed to render the symbol of the player on the screen.

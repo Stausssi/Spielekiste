@@ -67,6 +67,16 @@ class Snake(Game):
             hasColorkey=False
         )
 
+        # load Endscreen image
+        self.nameBackground = Image(
+            x=0,
+            y=0,
+            size=Configuration.windowSize,
+            pathToImage="images/snake/",
+            image="SnakeEndscreen.png",
+            hasColorkey=False
+        )
+
         # Initialize background music and sounds
         # https://patrickdearteaga.com/royalty-free-music/childs-nightmare/
         self.backgroundMusic = "sounds/snake/background.ogg"
