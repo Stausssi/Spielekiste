@@ -29,9 +29,9 @@ def main():
 
     # Create logging file, rotate if filesize exceeds 1MB
     logger.add("logs/{time}.log", rotation="1 MB")
-    logger.info("Started the game launcher. Make sure to support pygame!")
 
     GameContainer()
+    logger.info("Started the game launcher. Make sure to support pygame!")
 
 
 if __name__ == "__main__":
