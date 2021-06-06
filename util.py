@@ -225,7 +225,6 @@ class Game:
         Returns: None
         """
 
-        # TODO: Log --> Sicher ?
         pass
 
     def updateGameState(self) -> None:

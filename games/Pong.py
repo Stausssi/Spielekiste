@@ -1,6 +1,13 @@
 """
-This File contains the classes Player, Ball, and the main class Pong, which is used to start the pong game
+    file: Pong.py
+    description: Contains everything needed to play Pong.
+    This File contains the classes Player, Ball, and the main class Pong, which is used to start the pong game
+
+    author: Niklas Drössler
+    date: 29.05.2021
+    licence: free
 """
+
 
 import pygame
 
@@ -32,6 +39,10 @@ class Pong(Game):
         PongLogo.png: created with: https://de.flamingtext.com/Free-Logo-Designs/
         spacer.png: selfmade
         PongEndscreen: selfmade with Ponglogo.png
+
+    Tests:
+        - game initialzes all textures and sounds
+        - game initializes with/ without a computer player based on "hasComputerPlayer"
     """
 
     def __init__(self, hasComputerPlayer):
@@ -98,6 +109,10 @@ class Pong(Game):
 
         Return:
             None
+
+        Tests:
+            - The pregame screen is displayed correctly
+            - all textures are on their correct positions
         """
 
         # load all images
@@ -131,13 +146,20 @@ class Pong(Game):
 
         sleep(4)  # wait for seconds
 
-    def startGameOverScreen(self, player: int):
+    def startGameOverScreen(self, player: int) -> None:
         """
         This function calculates the score of the winning player and starts the gameover screen. The screen contains
         a specific text and the players score, it is set by calling the method setGameOverText().
 
         Args:
             player(Int): the player, that has won the game: 1 --> Player_one, 2 --> Player_two
+
+        Return:
+            None
+
+        Tests:
+            - the score is calculated correctly
+            - The gameOver Screen is started
         """
 
         # calculate the score of the player based on the time it took to win
@@ -160,6 +182,10 @@ class Pong(Game):
 
         Return:
             None
+
+        Tests:
+            - The score of either player one is increased
+            - The score of either player two is increased
         """
 
         if player == 1:
@@ -177,6 +203,11 @@ class Pong(Game):
 
         Return:
             None
+
+        Tests:
+            - The A and D keys set move_up and move down for player one
+            - The Arrow_left and Arrow_right keys set move_up and move down for player two
+            - The Arrow_left and Arrow_right keys do not work if player two is a computer player
         """
 
         # event handling
@@ -226,6 +257,11 @@ class Pong(Game):
 
         Return:
             None
+
+        Tests:
+            - the ball collides when it hits a wall
+            - the game is ended when one player reaches 5 points
+            - scoring a goal resets the balls velocity
         """
 
         # movement updates of players and ball
@@ -274,13 +310,17 @@ class Pong(Game):
 
             self.ball.reset()  # reset the velocity and position of the ball
 
-    def updateScreen(self):
+    def updateScreen(self) -> None:
         """
         This method updates the pygame window by drawing object. Here it draws the ball and the player,
         as well as the spacers in the middle of the game and the score counters
 
         Return:
             None
+
+        Tests:
+            - The Players and the Ball are drawn on the screen
+            - The score counter is updating after each goal
         """
 
         # fill game display black
@@ -312,6 +352,10 @@ class Player(Image):
     Apart from handling the image of the players, it also handles his movement.
     The flags move_up or move_down can be set and by calling the
     move()- function, the player position is updated.
+
+    Tests:
+        - The player is initialized correctly, all variables are set
+        - The image of the player is loaded
     """
 
     def __init__(self, x, y):
@@ -338,6 +382,10 @@ class Player(Image):
 
         Returns:
             None
+
+        Tests:
+            - The player does not move up, if he is already on the top
+            - The player is moved by the correct amount of pixels
         """
 
         if self.getY() > 20:
@@ -349,6 +397,10 @@ class Player(Image):
 
         Returns:
             None
+
+        Tests:
+            - The player does not move down, if he is already on the bottom
+            - The player is moved by the correct amount of pixels
         """
 
         if self.getY() < (Configuration.windowHeight - 20 - self.player_size[1]):
@@ -363,6 +415,10 @@ class Player(Image):
 
         Returns:
             None
+
+        Tests:
+            - The player moves up, when the flag: move_up is set
+            - The player moves down, when the flag: move_down is set
         """
 
         if self.move_up:
@@ -382,6 +438,11 @@ class Player(Image):
 
         Returns:
             None
+
+        Tests:
+            - The computer player doesn´t move, if the ball is on the other players side of the window
+            - The computer player doesn´t move, if the ball is moving away from him
+
         """
 
         # only move the computer player, when the ball is moving in it´s direction,
@@ -404,6 +465,10 @@ class Player(Image):
 
         Returns:
             None
+
+        Tests:
+            - a random sensitivity is set and updated
+            - a random speed is set and updated
         """
 
         self.sensitivity = randint(20, 70)
@@ -414,7 +479,11 @@ class Ball(Image):
     """
     This class is a child class of the Image class. It represents the pong ball.
     Apart from handling the image of the ball, it also handles his movement, collision,
-    and the the check, if a player has scored a point.
+    and the check, if a player has scored a point.
+
+    Tests:
+        - the ball is initialized correctly --> all variables are set
+        - the image of the ball is loaded
     """
 
     def __init__(self, x, y):
@@ -437,7 +506,11 @@ class Ball(Image):
             player (Player): the player used to check for collision
 
         Return:
-            None
+            Boolean
+
+        Tests:
+            - When colliding with a player, return "True"
+            - When not colliding with a player, return "False"
         """
 
         ball_rect = self.getRect()
@@ -450,6 +523,10 @@ class Ball(Image):
 
         Return:
             Boolean
+
+        Tests:
+            - When colliding with a top/bottom wall, return "True"
+            - When not colliding with a top/bottom wall, return "False"
         """
 
         y_coord = self.getY()
@@ -464,7 +541,11 @@ class Ball(Image):
             on the x- axis (1,1) -> ( 1,-1). When mode is y, it flips the velocity on the y- axis (1,1) -> (-1, 1).
 
         Return:
-            True, when the velocity has been flipped, if not, false
+            Boolean: True, when the velocity has been flipped, if not, false
+
+        Tests:
+            - The x velocity is not flipped, when lastFlip was less than 0.2 seconds ago
+            - When flipping the y velocity, (1,1) should be flipped to (-1, 1)
         """
 
         if mode == "x":
@@ -481,12 +562,16 @@ class Ball(Image):
 
         return True
 
-    def move(self):
+    def move(self) -> None:
         """
         This function moves the ball in the direction of it's speed vector.
 
         Return:
             None
+
+        Tests:
+            - The speed vector is applied in the correct direction
+            - The x and y coordinates are set after the change
         """
 
         new_x = self.getX() + self.speed[0]
@@ -501,6 +586,10 @@ class Ball(Image):
 
         Return:
             Integer (1 if p1 scores, 2 if player 2 scores)
+
+        Tests:
+            - When the ball moves out of the left side of the window, player two scores a goal
+            - When the ball moves out of the right side of the window, player one scores a goal
         """
 
         if self.getX() + self.SIZE[0] < 0:
@@ -516,6 +605,10 @@ class Ball(Image):
 
         Return:
             None
+
+        Tests:
+            - check, if ball speed is reset
+            - check, if ball is in the middle of the screen
         """
 
         self.speed = self.getRandomVelocity()
@@ -528,6 +621,10 @@ class Ball(Image):
 
         Return:
             (Integer, Integer): random velocity
+
+        Tests:
+            - check, if the velocity is within the correct boundaries
+            - check, if multiple function calls return different signs of the speed
         """
 
         v_x, v_y = randint(9, 15), randint(5, 8)

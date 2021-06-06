@@ -88,7 +88,7 @@ class Snake(Game):
                 # https://mixkit.co/free-sound-effects/arcade/ "Arcade retro game over"
                 "death": pygame.mixer.Sound("sounds/snake/death.wav")
             }
-        except():
+        except:
             logger.critical("Snake Sounds could not be loaded")
 
         # Position the snake in the middle of the field
@@ -345,7 +345,7 @@ class Snake(Game):
 
             # logging
 
-            logger.info("Snake has eaten food")
+            logger.info("Snake has eaten food, new score: {}", self.score)
 
             self.playSound("food")
 
