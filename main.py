@@ -18,7 +18,8 @@ from loguru import logger
 @logger.catch
 def main():
     """
-    Application entry point starting the GameContainer and therefore the application.
+    This method is starting the GameContainer and therefore the application.
+
 
     Tests:
         - Logger legt Datei korrekt an

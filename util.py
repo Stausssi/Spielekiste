@@ -226,6 +226,8 @@ class Game:
         Tests:
             - Korrektes Verhalten des Pausenmenüs
             - Score wird fehlerlos angezeigt
+
+        Returns: None
         """
 
         if self.isPaused:
@@ -308,6 +310,8 @@ class Game:
 
         Args:
             menu (pygame_menu.Menu): The menu to draw
+
+        Returns: None
         """
 
         if not menu:
@@ -363,6 +367,7 @@ class Game:
 
         Returns: None
         """
+
         sound = self.sounds[sound]
 
         if sound:
@@ -504,6 +509,8 @@ class Game:
 
         Args:
             text (str): the text that will be displayed on the endscreen
+
+        Returns: None
         """
 
         self.gameOverText = text
@@ -516,6 +523,8 @@ class Game:
         Tests:
             - Musik wird ohne Probleme gestoppt
             - Variable wird korrekt gesetzt
+
+        Returns: None
         """
 
         pygame.mixer.music.stop()
@@ -834,7 +843,11 @@ class GameContainer(Game):
         Tests:
             - Applikation wird ohne Fehler beendet
             - Rückgabecode wird korrekt übergeben
+
+        Returns: None
         """
+
+        super().quit()
 
         pygame.quit()
         exit(0)

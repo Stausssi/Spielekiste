@@ -645,7 +645,7 @@ class SnakeTile(Image):
 
         return self.direction - newDirection
 
-    def bendImage(self, angle, flip):
+    def bendImage(self, angle, flip) -> None:
         """
         Replace the image of a body tile with the corner image. Also handle rotation and horizontal mirroring of the
         image.
