@@ -357,7 +357,9 @@ class Game:
         """
 
         self.isPaused = not self.isPaused
-        if not self.isGameOver:
+
+        # Only log if game is not over and not in the main menu
+        if not self.isGameOver and self.game != "":
             if self.isPaused:
                 logger.info("The game was paused")
             else:
