@@ -716,7 +716,7 @@ class GameContainer(Game):
 
         Tests:
             - Spielfenster wechselt korrekt in den Fullscreen oder zurück in den Fenstermodus
-            -
+            - Methodenaufruf wird immer korrekt ausgeführt
 
         Args:
             args: Optional. Only needed to satisfy pygame-menu requirements.
