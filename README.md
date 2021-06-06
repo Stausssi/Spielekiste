@@ -1,17 +1,21 @@
 # Spielekiste
 Game Container to support multiple arcade games 
 
-Spielekiste mit mehreren kleinen Spielen, beispielsweise Tic Tac Toe, Pong, Pac Man, Space Invader,
-Snake, Achtung die Kurve. Anzahl der Spiele erweiterbar um alles, was nicht von der Anzeige von
-privaten Informationen (beispielsweise Kartenhand bei Uno) abhängt. Gespielt werden kann sowohl
-gegen einen echten Menschen (lokal), oder gegen einen Computer. Der Computer wird entweder
-durch statische Programmierung oder mit Hilfe einer künstlichen Intelligenz implementiert.
-Spiele sollen über grafisches Hauptmenü auswählbar sein. 
+## Beschreibung
+Spielekiste mit den Spielen:
+- TicTac Toe 
+- Pong
+- Snake 
+
+Pong und TicTacToe können lokal gegen einen echten Menschen gespielt werden. Des Weiteren wurde für Pong ein statischer
+Computerspieler implementiert, gegen den gespielt werden kann.
+
+Die Spiele können über ein Hauptmenü gestartet werden, welches parallel zu den Spielen auch noch deren Highscores
+beinhaltet. Zusätzlich dazu kann man noch eine Einstellung treffen, die den Vollbildmodus (de-)aktiviert.
 
 ## Contributors
 - Niklas Drössler
 - Simon Stauss
-
 
 ## How to play
 1. Open the application folder.
