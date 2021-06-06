@@ -7,9 +7,10 @@
     licence: free
 """
 
-# import os
-# # Remove pygame support message
-# os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
+import os
+# Hide pygame support message
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
+
 from util import GameContainer
 from loguru import logger
 
@@ -28,7 +29,7 @@ def main():
 
     # Create logging file, rotate if filesize exceeds 1MB
     logger.add("logs/{time}.log", rotation="1 MB")
-    logger.info("Started the game launcher")
+    logger.info("Started the game launcher. Make sure to support pygame!")
 
     GameContainer()
 
