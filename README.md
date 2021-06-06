@@ -28,13 +28,20 @@ beinhaltet. Zusätzlich dazu kann man noch eine Einstellung treffen, die den Vol
 Pasted from a lesson:
 
 Kernkriterien:
-- (20%) - alle Funktionen und Module sowie Klassen müssen Docstrings nach z.B. Googole (Docstrings pep8) enthalten
+- (20%) - alle Funktionen und Module sowie Klassen müssen Docstrings nach z.B. Google (Docstrings pep8) enthalten
 - (10%) - alle Funktionen und Klassen müssen jeweils 2 Testbeschreibungen enthalten
 
 Sitekriterien:
 - (10%) - Eigenleistung: geeignetes Logverfahren suchen und anwenden
+  --> Umgesetzt mit Loguru (https://github.com/Delgan/loguru)
 - (20%) - Codequalität und Stil
+  --> Verwendung Numpy
+  --> Verwendung Pandas Dataframe
 - (20%) - Funktionalität (requirement Informationen --- welche Module, Frameworks, Versionen, OS ...)
+
+- (20%) - Eigenaufwand/ Intuitivität der UI
+  --> eigene Erstellung vieler Gamegrafiken
+  --> eigene Erstellung der Endscreens
 
 weitere Kriterien:
 - wir wollen am Ende kein kundenfähiges System
