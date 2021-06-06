@@ -31,6 +31,7 @@ class TicTacToe(Game):
         # Disable score but still show name enter if someone won
         self.hasScore = False
         self.showGameOver = True
+        self.gameOverTimer = Timer(1, self.quit)
         self.draw = False
 
         # Center the field
@@ -255,8 +256,9 @@ class TicTacToe(Game):
             font=self.notifyFont
         )
 
-        # Quit the game in a second
-        Timer(1, self.quit).start()
+        # Quit the game in a second if the timer isn't running
+        if not self.gameOverTimer.is_alive():
+            self.gameOverTimer.start()
 
     @staticmethod
     def indexFromXY(x, y) -> int:

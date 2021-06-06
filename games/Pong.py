@@ -193,6 +193,9 @@ class Pong(Game):
         elif player == 2:
             self._score[1] += 1
 
+        # logging
+        logger.info("Player {winner} has scored a goal. Score: {score}", winner=player, score=str(self._score))
+
     def handleEvent(self, event) -> None:
         """
         This function overrides the handleEvent function of it´s parent class. It handles all keyboard events
@@ -290,10 +293,6 @@ class Pong(Game):
         if round_winner:
 
             self.playSound("fail", 0.3)
-
-            # logging
-            logger.info("Player {winner} has scored a goal. Score: {score}", winner=round_winner,
-                        score=str(self._score))
 
             if round_winner == 1:
                 # increase player one score

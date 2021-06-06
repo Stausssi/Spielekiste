@@ -536,7 +536,7 @@ class Game:
                     score = values["Score"][0]
                 except KeyError:
                     score = values["Wins"][0]
-                logger.info("Score {} has been added for {}", score, values["Player"][0])
+                logger.info("Score {} has been added for {} in game {}", score, values["Player"][0], self.game)
             except():
                 logger.critical("Score could not be saved")
 
@@ -575,7 +575,10 @@ class Game:
         Returns: None
         """
 
-        logger.info("Game has been quit")
+        if self.game != "":
+            logger.info("{} has been quit", self.game)
+        else:
+            logger.info("Menu has been quit")
 
         pygame.mixer.music.stop()
 
