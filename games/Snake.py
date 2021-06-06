@@ -14,6 +14,7 @@ from threading import Timer
 
 from config import Configuration, Colors
 from util import Game, Image
+from loguru import logger
 
 
 class Snake(Game):
@@ -80,12 +81,15 @@ class Snake(Game):
         # Initialize background music and sounds
         # https://patrickdearteaga.com/royalty-free-music/childs-nightmare/
         self.backgroundMusic = "sounds/snake/background.ogg"
-        self.sounds = {
-            # https://mixkit.co/free-sound-effects/eat/ "Chewing something crunchy":
-            "food": pygame.mixer.Sound("sounds/snake/food.wav"),
-            # https://mixkit.co/free-sound-effects/arcade/ "Arcade retro game over"
-            "death": pygame.mixer.Sound("sounds/snake/death.wav")
-        }
+        try:
+            self.sounds = {
+                # https://mixkit.co/free-sound-effects/eat/ "Chewing something crunchy":
+                "food": pygame.mixer.Sound("sounds/snake/food.wav"),
+                # https://mixkit.co/free-sound-effects/arcade/ "Arcade retro game over"
+                "death": pygame.mixer.Sound("sounds/snake/death.wav")
+            }
+        except():
+            logger.critical("Snake Sounds could not be loaded")
 
         # Position the snake in the middle of the field
         # If width or height is odd add half of a snake tile to stay centered
@@ -338,6 +342,10 @@ class Snake(Game):
         # Check whether the head is on top of a food
         if self.food.getRect() == self.head.getRect():
             self.score += 100
+
+            # logging
+
+            logger.info("Snake has eaten food")
 
             self.playSound("food")
 

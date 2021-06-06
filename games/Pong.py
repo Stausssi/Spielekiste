@@ -11,6 +11,7 @@ import numpy as np
 from time import time
 from time import sleep
 from config import Colors
+from loguru import logger
 
 
 class Pong(Game):
@@ -27,9 +28,10 @@ class Pong(Game):
         AandD.png: selfmade
         ArrowLeftRight.png: selfmade
         ballbyte.png: selfmade
-        plane.png: selfmade
+        plane.png: from https://www.bienenfisch-design.de/produkt/bits-and-bytes/ and edited
         PongLogo.png: created with: https://de.flamingtext.com/Free-Logo-Designs/
         spacer.png: selfmade
+        PongEndscreen: selfmade with Ponglogo.png
     """
 
     def __init__(self, hasComputerPlayer):
@@ -41,7 +43,7 @@ class Pong(Game):
         self.hasScore = False
         self.showGameOver = True
 
-        self.font = pygame.font.SysFont(None, 78)  # initialize the font
+        self.font = pygame.font.SysFont("arial", 78)  # initialize the game font
 
         # Player Setup
         self.player_one = Player(100, 50)
@@ -64,11 +66,14 @@ class Pong(Game):
                 Image(Configuration.windowWidth / 2, 40 * i, (10, 30), "spacer.png", pathToImage="images/Pong/"))
 
         # load sounds
-        self.sounds = {
-            "wall_collision": pygame.mixer.Sound("sounds/Pong/wall_collision.wav"),
-            "player_collision": pygame.mixer.Sound("sounds/Pong/player_collision.wav"),
-            "fail": pygame.mixer.Sound("sounds/Pong/fail.wav")
-        }
+        try:
+            self.sounds = {
+                "wall_collision": pygame.mixer.Sound("sounds/Pong/wall_collision.wav"),
+                "player_collision": pygame.mixer.Sound("sounds/Pong/player_collision.wav"),
+                "fail": pygame.mixer.Sound("sounds/Pong/fail.wav")
+            }
+        except():
+            logger.critical("Pong Sounds could not be loaded")
 
         # set gameover screen settings
         # load endscreen image
@@ -121,6 +126,9 @@ class Pong(Game):
                                font=self.font)
 
         super().updateScreen()  # display images on screen
+
+        logger.info("Displaying prescreen animation")
+
         sleep(4)  # wait for seconds
 
     def startGameOverScreen(self, player: int):
@@ -250,6 +258,10 @@ class Pong(Game):
 
             self.playSound("fail", 0.3)
 
+            # logging
+            logger.info("Player {winner} has scored a goal. Score: {score}", winner=round_winner,
+                        score=str(self._score))
+
             if round_winner == 1:
                 # increase player one score
                 self.updateScore(1)
@@ -366,7 +378,7 @@ class Player(Image):
         This function handles the movement of a computer player.
         It moves the computer player in the direction of the ball, if certain criteria are met.
         Furthermore, it makes the computer player easier to win against by introducing a some
-        errors, or by reducing it´s speed.
+        errors, or by reducing it´s speed randomly.
 
         Args:
             ball (Ball): the ball that the player should move to
@@ -390,6 +402,8 @@ class Player(Image):
         """
         This function sets a random speed and sensitivity for the player.
         This is used, so that the computer player can have some inaccuracies and lose the game easier.
+        This method is intended to be used after a collision of the ball, so that the computer player
+        has a different sensitivity and speed after each bounce
 
         Returns:
             None
@@ -414,7 +428,8 @@ class Ball(Image):
         # speed
         self.speed = self.getRandomVelocity()
 
-        #
+        # time since last velocity flip, this is needed to prevent a bug,
+        # where the ball would glitch into the player
         self.lastFlip = time()
 
     def didCollideWithPlayer(self, player: Player):
@@ -455,17 +470,19 @@ class Ball(Image):
             True, when the velocity has been flipped, if not, false
         """
 
-        currentTime = time()
+        if mode == "x":
+            currentTime = time()
+            # The ball can only flip it´s velocity, when the last flip is more than 0.2 seconds ago
 
-        if (currentTime - self.lastFlip) > 0.2:
-            if mode == "x":
+            if (currentTime - self.lastFlip) > 0.2:
                 self.speed = (-self.speed[0], self.speed[1])
-            elif mode == "y":
-                self.speed = (self.speed[0], -self.speed[1])
-            self.lastFlip = currentTime
-            return True
+                self.lastFlip = currentTime  # set the last flip to the current time
+            else:
+                return False  # indicates, that the ball has not been flipped
+        elif mode == "y":
+            self.speed = (self.speed[0], -self.speed[1])
 
-        return False
+        return True
 
     def move(self):
         """
@@ -513,7 +530,7 @@ class Ball(Image):
         Generates a random velocity tuple, that has random x/y values and signs.
 
         Return:
-            (Integer, Integer)
+            (Integer, Integer): random velocity
         """
 
         v_x, v_y = randint(9, 15), randint(5, 8)

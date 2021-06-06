@@ -11,6 +11,7 @@
 import os
 import pygame
 from pandas import DataFrame
+from loguru import logger
 
 from pygame_textinput import TextInput
 import pygame_menu
@@ -47,6 +48,7 @@ class Game:
             self.scores = Configuration.SCORE_DATA[game]
         except KeyError:
             self.scores = None
+            # no logging, because the logging happens in Configuration.SCORE_DATA
 
         self.windowSize = windowSize
         self.events = None
@@ -76,7 +78,10 @@ class Game:
 
         # Font
         pygame.font.init()
-        self.defaultFont = pygame.font.SysFont("arial", 25)
+        try:
+            self.defaultFont = pygame.font.SysFont("arial", 25)
+        except():
+            logger.critical("Default font could not be loaded")
 
         # Create the pause menu
         self.pauseMenu = pygame_menu.Menu(
@@ -98,13 +103,16 @@ class Game:
         self.endFont = pygame.font.SysFont("arial", 50)
         self.nameSubmit = False
         self.nameInputX, self.nameInputY = (Configuration.windowWidth // 2, Configuration.windowHeight // 2)
-        self.nameBackground = Image(
-            x=0,
-            y=0,
-            size=Configuration.windowSize,
-            image="nameInput.png",
-            hasColorkey=False
-        )
+        try:
+            self.nameBackground = Image(
+                x=0,
+                y=0,
+                size=Configuration.windowSize,
+                image="nameInput.png",
+                hasColorkey=False
+            )
+        except FileNotFoundError:
+            logger.critical("File: nameInput.png could not be loaded")
 
     def run(self) -> None:
         """
@@ -121,9 +129,14 @@ class Game:
         Returns: None
         """
 
+        logger.info("Start the gameloop of {}", self.game)
+
         # Play background music
         if self.backgroundMusic is not None:
-            pygame.mixer.music.load(self.backgroundMusic)
+            try:
+                pygame.mixer.music.load(self.backgroundMusic)
+            except FileNotFoundError:
+                logger.critical("Background music could not be loaded")
             pygame.mixer.music.set_volume(Configuration.MUSIC_VOLUME)
             pygame.mixer.music.play(-1)
 
@@ -207,7 +220,7 @@ class Game:
         Returns: None
         """
 
-        # TODO: Log
+        # TODO: Log --> Sicher ?
         pass
 
     def updateGameState(self) -> None:
@@ -338,6 +351,10 @@ class Game:
         """
 
         self.isPaused = not self.isPaused
+        if self.isPaused:
+            logger.info("The game was paused")
+        else:
+            logger.info("The game was unpaused")
 
     def toggleFullscreen(self, *args) -> None:
         """
@@ -355,6 +372,12 @@ class Game:
         """
 
         Configuration.isFullscreen = not Configuration.isFullscreen
+
+        if Configuration.isFullscreen:
+            logger.info("Fullscreen is enabled")
+        else:
+            logger.info("Fullscreen is disabled")
+
         pygame.display.toggle_fullscreen()
 
     def playSound(self, sound, volume=1.0) -> None:
@@ -390,6 +413,8 @@ class Game:
         Returns: None
         """
 
+        logger.info("Gameover in game: {game}", game=self.game)
+
         # Ask the user for their name to save the score
         name = self.getUserName()
 
@@ -402,6 +427,7 @@ class Game:
             dataHeader = Configuration.DATA_HEADERS[self.game]
         except KeyError:
             dataHeader = None
+            logger.critical("Game score could not be saved")
 
         if dataHeader:
             for header in dataHeader:
@@ -452,6 +478,8 @@ class Game:
 
             self.clock.tick(Configuration.FRAMERATE)
 
+        logger.info("User has entered his name: {}", nameInput.get_text())
+
         return nameInput.get_text()
 
     def saveScore(self, values) -> None:
@@ -496,7 +524,10 @@ class Game:
             )
 
             # Save the csv file without the index
-            self.scores.to_csv(f"scores/{self.game}.csv", index=False)
+            try:
+                self.scores.to_csv(f"scores/{self.game}.csv", index=False)
+            except():
+                logger.critical("Score could not be saved")
 
             # Update global scores
             Configuration.SCORE_DATA[self.game] = self.scores
@@ -517,6 +548,8 @@ class Game:
         Returns: None
         """
 
+        logger.info("The gameover text for {game} has been set to: {text}", game=self.game, text=text)
+
         self.gameOverText = text
 
     def quit(self) -> None:
@@ -530,6 +563,8 @@ class Game:
 
         Returns: None
         """
+
+        logger.info("Game has been quit")
 
         pygame.mixer.music.stop()
 
@@ -662,6 +697,8 @@ class GameContainer(Game):
         Returns: None
         """
 
+        logger.info("Start snake game")
+
         from games.Snake import Snake
         Snake()
 
@@ -676,6 +713,8 @@ class GameContainer(Game):
 
         Returns: None
         """
+
+        logger.info("Start TikTakToe game")
 
         from games.TicTacToe import TicTacToe
         TicTacToe()
@@ -692,6 +731,8 @@ class GameContainer(Game):
         Returns: None
         """
 
+        logger.info("Start Pong multiplayer")
+
         from games.Pong import Pong
         Pong(False)
 
@@ -706,6 +747,8 @@ class GameContainer(Game):
 
         Returns: None
         """
+
+        logger.info("Start Pong with computer player")
 
         from games.Pong import Pong
         Pong(True)
@@ -744,6 +787,8 @@ class GameContainer(Game):
 
         Returns: None
         """
+
+        logger.info("The Fullscreen button was toggled")
 
         if widget:
             widget.set_value(Configuration.isFullscreen)
@@ -805,6 +850,8 @@ class GameContainer(Game):
                 # Create a draw callback to be fired each time the table is drawn.
                 # This is used to refresh the table
                 table.add_draw_callback(self.refreshScoreTable)
+
+                logger.info("Highscore table was updated for {game}", game=game)
             else:
                 # Display a label telling the user no scores are available just yet
                 label = self.highscoreMenu.add.label(
@@ -813,6 +860,8 @@ class GameContainer(Game):
                     margin=(0, 20)
                 )
                 self.highscoreMenu.move_widget_index(label, 1)
+
+                logger.info("Highscore table was updated for {game}, but was empty ", game=game)
 
     def refreshScoreTable(self, widget, menu) -> None:
         """
@@ -895,7 +944,10 @@ class Image(pygame.sprite.Sprite):
         super().__init__()
 
         # Load the given image
-        self.image = pygame.transform.smoothscale(pygame.image.load(os.path.join(pathToImage, image)).convert(), size)
+        try:
+            self.image = pygame.transform.smoothscale(pygame.image.load(os.path.join(pathToImage, image)).convert(), size)
+        except FileNotFoundError:
+            logger.info("Image {} could not be loaded", image)
 
         # Apply colorkey
         if hasColorkey:

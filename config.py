@@ -9,6 +9,7 @@
 
 import pandas
 from pandas.errors import EmptyDataError
+from loguru import logger
 
 
 class Configuration:
@@ -51,10 +52,10 @@ class Configuration:
         try:
             frame = pandas.read_csv(f"scores/{game}.csv")
         except EmptyDataError:
-            # TODO: Log csv file is empty
+            logger.debug("Score csv file is empty")
             pass
         except FileNotFoundError:
-            # TODO: Log csv file missing
+            logger.critical("TODO: Log csv file missing")
             pass
         finally:
             if frame is None:

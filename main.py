@@ -28,6 +28,7 @@ def main():
 
     # Create logging file, rotate if filesize exceeds 1MB
     logger.add("logs/{time}.log", rotation="1 MB")
+    logger.info("Started the game launcher")
 
     GameContainer()
 
