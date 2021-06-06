@@ -1,15 +1,31 @@
+"""
+    file: config.py
+    description: Contains constants (Configuration and Colors) for the application.
+
+    author: Niklas Drössler, Simon Stauss
+    date: 14.04.2021
+    licence: free
+"""
+
 import pandas
+from pandas.errors import EmptyDataError
 
 
 class Configuration:
     """
     A static configuration class containing the most important values, such as window size, etc.
+
+    Tests:
+        - Variablen werden korrekt angelegt
+        - DataFrame wird korrekt aus der CSV gelesen
     """
 
     windowWidth, windowHeight = 1920, 1080
     windowSize = (windowWidth, windowHeight)
     windowTitle = "Niklas und Simons Spielekiste"
-    MUSIC_VOLUME = 0.3
+    isFullscreen = False
+
+    MUSIC_VOLUME = 0.1
     FRAMERATE = 60
     
     GAME_SNAKE = "Snake"
@@ -31,8 +47,28 @@ class Configuration:
     SCORE_DATA = {}
     for game in DATA_HEADERS.keys():
         # Get the highest scores from the csv file
+        frame = None
+        try:
+            frame = pandas.read_csv(f"scores/{game}.csv")
+        except EmptyDataError:
+            # TODO: Log csv file is empty
+            pass
+        except FileNotFoundError:
+            # TODO: Log csv file missing
+            pass
+        finally:
+            if frame is None:
+                # Create a new DataFrame
+                dataDict = {}
+                for header in DATA_HEADERS[game]:
+                    dataDict.update({
+                        header: []
+                    })
+
+                frame = pandas.DataFrame(data=dataDict)
+
         SCORE_DATA.update({
-            game: pandas.read_csv(f"scores/{game}.csv")
+            game: frame
         })
 
     # Needed for dynamic table updates
@@ -50,6 +86,14 @@ class Configuration:
 
 
 class Colors:
+    """
+    A static class containing constants of tuples containing the RGB values of a color.
+
+    Tests:
+        - Farben alle korrekt definiert
+        - Werte werden korrekt abgerufen
+    """
+
     White = (255, 255, 255)
     Black = (0, 0, 0)
     VeryLightGreen = (0, 255, 0)

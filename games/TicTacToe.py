@@ -1,3 +1,12 @@
+"""
+    file: TicTacToe.py
+    description: Contains everything needed to play TicTacToe.
+
+    author: Simon Stauss
+    date: 30.05.2021
+    licence: free
+"""
+
 import pygame
 from threading import Timer
 
@@ -9,6 +18,14 @@ from util import Game, Image
 
 class TicTacToe(Game):
     def __init__(self):
+        """
+        TicTacToe is game where two players play against each other on a 3x3 field. The first player to reach 3 symbols
+        in a row, column or diagonal wins.
+
+        Tests:
+            - Variablen korrekt angelegt
+            - Berechnungen alle fehlerfrei
+        """
         super().__init__(game=Configuration.GAME_TTT)
 
         # Disable score but still show name enter if someone won
@@ -94,7 +111,19 @@ class TicTacToe(Game):
         # Run the game
         self.run()
 
-    def updateScreen(self):
+    def updateScreen(self) -> None:
+        """
+        This method draws the field and placed symbols on the screen. It also draws the symbol of the current player at
+        the position of the mouse.
+        It also notifies the players of a winner or draw.
+
+        Tests:
+            - Darstellung korrekt und in richtiger Reihenfolge
+            - Variablen alle korrekt gesetzt
+
+        Returns: None
+        """
+
         # Draw white background
         pygame.draw.rect(
             self.surface,
@@ -132,7 +161,17 @@ class TicTacToe(Game):
 
         super().updateScreen()
 
-    def updateGameState(self):
+    def updateGameState(self) -> None:
+        """
+        This method updates the state of the game. It checks whether a player has won or if the game is a draw.
+
+        Tests:
+            - Überprüfung auf Gewinner korrekt
+            - Gleiche Kombination der Felder führt immer zum selben Ergebnis
+
+        Returns: None
+        """
+
         # Check every possibility a player can with with
         for win in self.winPossibilities:
             # Check whether every field of the win possibility is occupied by the same player
@@ -143,7 +182,6 @@ class TicTacToe(Game):
             # Notify the users and end the game if that's the case
             if hasWon:
                 self.winner = self.currentPlayer
-
                 break
 
         self.draw = self.turns == 9 and not self.winner
@@ -151,7 +189,21 @@ class TicTacToe(Game):
         # Update the player
         self.currentPlayer = self.players[self.turns % 2]
 
-    def handleEvent(self, event):
+    def handleEvent(self, event) -> None:
+        """
+        This method handles the events needed for the game to work. It reacts to a mouse click with the primary button
+        and mouse motion.
+
+        Tests:
+            - Gleiches Event für immer zum selben Ergebnis
+            - Variablen werden korrekt gesetzt
+
+        Args:
+            event (pygame.event.Event):
+
+        Returns: None
+        """
+
         if not self.isGameOver:
             # Mouse left click
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -171,10 +223,14 @@ class TicTacToe(Game):
             elif event.type == pygame.MOUSEMOTION:
                 self.mousePos = event.pos
 
-    def gameStateNotification(self, text, isDraw=False):
+    def gameStateNotification(self, text, isDraw=False) -> None:
         """
         Notifies the user of a change in the game state. This means that either someone won or the game is a draw.
         It also enables the regular mouse pointer again and plays a sound.
+
+        Tests:
+            - Parameter werden korrekt übergeben
+            - Farbe des Texts wird korrekt ausgewählt
 
         Args:
             text (str): The text that will be displayed
@@ -208,6 +264,10 @@ class TicTacToe(Game):
         This method converts x and y coordinates into an usable index.
         Used for the field array
 
+        Tests:
+            - Parameter werden korrekt übergeben
+            - Die selbe Kombination (x, y) führt immer zum selben Index
+
         Args:
             x (int): The x coordinate ranging between [0, 2]
             y (int): The y coordinate ranging between [0, 2]
@@ -224,6 +284,10 @@ class TTTTile:
         This class represents a TicTacToeTile.
         It contains the position of the tile and the player occupying it.
 
+        Tests:
+            - Variablen werden korrekt übergeben
+            - Variablen werden korrekt gesetzt
+
         Args:
             x (int): The x coordinate of the center of the tile
             y (int): The y coordinate of the center of the tile
@@ -236,6 +300,10 @@ class TTTTile:
     def setPlayer(self, player) -> bool:
         """
         Updates the player of a field, if it's not already occupied by someone.
+
+        Tests:
+            - Rückgabewert wird richtig zurückgegeben
+            - Variable wird verändert
 
         Args:
             player (str): The player that wants to occupy the field
@@ -255,17 +323,27 @@ class TTTTile:
         """
         Returns the player of the field.
 
-        Returns: The player occupying the field
+        Tests:
+            - Wert wird korrekt zurückgegeben
+            - Variable enthält ein einziges Zeichen aus ["X", "Y"] oder gar kein Zeichen
 
+        Returns: The player occupying the field
         """
+
         return self.player
 
-    def getPos(self) -> Tuple[int, int]:
+      
+    def getPos(self):
+
         """
         Returns the position of the tile.
         It is needed to render the symbol of the player on the screen.
 
-        Returns: A tuple containing both the x and y coordinate.
+        Tests:
+            - Wert wird korrekt zurückgegeben
+            - Tupel wird korrekt erstellt und spiegelt die Position wieder
+
+        Returns (tuple[int, int]: A tuple containing both the x and y coordinate.
         """
 
         return self.x, self.y
