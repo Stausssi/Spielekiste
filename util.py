@@ -9,6 +9,8 @@
 """
 
 import os
+import re
+
 import pygame
 from pandas import DataFrame
 from loguru import logger
@@ -355,10 +357,13 @@ class Game:
         """
 
         self.isPaused = not self.isPaused
-        if self.isPaused:
-            logger.info("The game was paused")
-        else:
-            logger.info("The game was unpaused")
+
+        # Only log if game is not over and not in the main menu
+        if not self.isGameOver and self.game != "":
+            if self.isPaused:
+                logger.info("The game was paused")
+            else:
+                logger.info("The game was unpaused")
 
     def toggleFullscreen(self, *args) -> None:
         """
@@ -471,11 +476,27 @@ class Game:
             self.drawImageOnSurface(self.nameBackground)
             nameSurface = nameInput.get_surface()
             self.surface.blit(nameSurface, (self.nameInputX + 10, self.nameInputY - nameSurface.get_height() // 2))
+
+            # Draw the game over notification
             self.drawTextOnSurface(
                 self.gameOverText,
                 (Configuration.windowWidth / 2, Configuration.windowHeight * 5 / 12),
                 Colors.White,
                 font=self.endFont
+            )
+
+            # Notify user of validity of their name
+            text = "Your name is valid! Press Enter to submit!"
+            color = Colors.Green
+            if not self.validateName(nameInput.get_text()):
+                self.nameSubmit = False
+                text = "Your name is not valid!"
+                color = Colors.Red
+
+            self.drawTextOnSurface(
+                text,
+                (Configuration.windowWidth / 2, Configuration.windowHeight * 55 / 100),
+                color
             )
 
             pygame.display.update()
@@ -485,6 +506,23 @@ class Game:
         logger.info("User has entered his name: {}", nameInput.get_text())
 
         return nameInput.get_text()
+
+    @staticmethod
+    def validateName(name) -> bool:
+        """
+        This method returns whether the given string fulfills the requirements of a name. It has to have at least a
+        single character and can only contain numbers and letters. In total the name has to contain less than 25
+        characters.
+
+        Args:
+            name (str): The name to validate
+
+        Returns: Whether the string meets the requirements
+        """
+
+        # Regex Validation from: https://www.geeksforgeeks.org/how-to-check-a-valid-regex-string-using-python/
+        pattern = re.compile(r"[A-Za-z0-9.]+")
+        return bool(re.fullmatch(pattern, name)) and len(name) <= 25
 
     def saveScore(self, values) -> None:
         """
@@ -575,10 +613,11 @@ class Game:
         Returns: None
         """
 
-        if self.game != "":
-            logger.info("{} has been quit", self.game)
-        else:
-            logger.info("Menu has been quit")
+        if not self.isGameOver:
+            if self.game != "":
+                logger.info("{} has been quit", self.game)
+            else:
+                logger.info("Menu has been quit")
 
         pygame.mixer.music.stop()
 

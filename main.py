@@ -7,9 +7,10 @@
     licence: free
 """
 
-# import os
-# # Remove pygame support message
-# os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
+import os
+# Hide pygame support message
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
+
 from util import GameContainer
 from loguru import logger
 
@@ -30,7 +31,7 @@ def main():
     logger.add("logs/{time}.log", rotation="1 MB")
 
     GameContainer()
-    logger.info("Started the game launcher")
+    logger.info("Started the game launcher. Make sure to support pygame!")
 
 
 if __name__ == "__main__":
