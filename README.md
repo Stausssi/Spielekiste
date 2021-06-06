@@ -33,15 +33,15 @@ Kernkriterien:
 
 Sitekriterien:
 - (10%) - Eigenleistung: geeignetes Logverfahren suchen und anwenden
-  --> Umgesetzt mit Loguru (https://github.com/Delgan/loguru)
+  - Umgesetzt mit Loguru (https://github.com/Delgan/loguru)
 - (20%) - Codequalität und Stil
-  --> Verwendung Numpy
-  --> Verwendung Pandas Dataframe
+  - Verwendung Numpy
+  - Verwendung Pandas Dataframe
 - (20%) - Funktionalität (requirement Informationen --- welche Module, Frameworks, Versionen, OS ...)
 
 - (20%) - Eigenaufwand/ Intuitivität der UI
-  --> eigene Erstellung vieler Gamegrafiken
-  --> eigene Erstellung der Endscreens
+  - eigene Erstellung vieler Gamegrafiken
+  - eigene Erstellung der Endscreens
 
 weitere Kriterien:
 - wir wollen am Ende kein kundenfähiges System
