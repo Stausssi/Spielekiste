@@ -52,11 +52,9 @@ class Configuration:
         try:
             frame = pandas.read_csv(f"scores/{game}.csv")
         except EmptyDataError:
-            logger.debug("Score csv file is empty")
-            pass
+            logger.debug("CSV file for {} is empty", game)
         except FileNotFoundError:
-            logger.critical("TODO: Log csv file missing")
-            pass
+            logger.critical("CSV file for {} is missing", game)
         finally:
             if frame is None:
                 # Create a new DataFrame
@@ -67,6 +65,9 @@ class Configuration:
                     })
 
                 frame = pandas.DataFrame(data=dataDict)
+
+                #  logging
+                logger.info("New Dataframe for {} has been created.", game)
 
         SCORE_DATA.update({
             game: frame

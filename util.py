@@ -129,7 +129,12 @@ class Game:
         Returns: None
         """
 
-        logger.info("Start the gameloop of {}", self.game)
+        # Log the start of the gameloop
+        if self.game:
+            game = self.game
+        else:
+            game = "Menu"
+        logger.info("Start the gameloop of {}", game)
 
         # Play background music
         if self.backgroundMusic is not None:
@@ -526,6 +531,13 @@ class Game:
             # Save the csv file without the index
             try:
                 self.scores.to_csv(f"scores/{self.game}.csv", index=False)
+
+                # logging
+                try:
+                    score = values["Score"][0]
+                except KeyError:
+                    score = values["Wins"][0]
+                logger.info("Score {} has been added for {}", score, values["Player"][0])
             except():
                 logger.critical("Score could not be saved")
 
@@ -787,8 +799,6 @@ class GameContainer(Game):
 
         Returns: None
         """
-
-        logger.info("The Fullscreen button was toggled")
 
         if widget:
             widget.set_value(Configuration.isFullscreen)

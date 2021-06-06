@@ -145,9 +145,6 @@ class Pong(Game):
         score = int(
             10000 // (endTime - self.startTime))  # the faster a player wins, the more points he gets
 
-        # TODO -->  exchange for log
-        print(f"Player {player} has won!")
-
         # generate gameover text
         self.setGameOverText(f"Player {player} has won! Score: {score}")
         self.score = score
