@@ -23,7 +23,9 @@ class Configuration:
     windowWidth, windowHeight = 1920, 1080
     windowSize = (windowWidth, windowHeight)
     windowTitle = "Niklas und Simons Spielekiste"
-    MUSIC_VOLUME = 0.3
+    isFullscreen = False
+
+    MUSIC_VOLUME = 0.1
     FRAMERATE = 60
     
     GAME_SNAKE = "Snake"

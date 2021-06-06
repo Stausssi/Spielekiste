@@ -61,9 +61,13 @@ class Game:
         if self.game != "":
             title += f" | {self.game}"
         pygame.display.set_caption(title)
-        self.surface = pygame.display.set_mode(size=self.windowSize)
+
+        if Configuration.isFullscreen:
+            self.surface = pygame.display.set_mode(size=self.windowSize, flags=pygame.FULLSCREEN)
+        else:
+            self.surface = pygame.display.set_mode(size=self.windowSize)
+
         self.backgroundImage = None
-        self.isFullscreen = False
 
         # Music
         pygame.mixer.init()
@@ -350,7 +354,7 @@ class Game:
         Returns: None
         """
 
-        self.isFullscreen = not self.isFullscreen
+        Configuration.isFullscreen = not Configuration.isFullscreen
         pygame.display.toggle_fullscreen()
 
     def playSound(self, sound, volume=1.0) -> None:
@@ -595,12 +599,13 @@ class GameContainer(Game):
         self.playMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to options menu
-        self.optionsMenu.add.toggle_switch(
+        toggle = self.optionsMenu.add.toggle_switch(
             title="Fullscreen",
-            default=self.isFullscreen,
+            default=Configuration.isFullscreen,
             onchange=self.toggleFullscreen,
             toggleswitch_id="fullscreen"
         )
+        toggle.add_draw_callback(self.updateFullscreenToggle)
         self.optionsMenu.add.button("Back", pygame_menu.events.BACK)
 
         # Add buttons to highscore menu
@@ -711,8 +716,7 @@ class GameContainer(Game):
 
         Tests:
             - Spielfenster wechselt korrekt in den Fullscreen oder zurück in den Fenstermodus
-            - self.isFullscreen spiegelt immer korrekt den Stand des Fensters wieder
-            - Toggle-Switch spiegelt immer den aktuellen Stand des Fensters  wieder
+            -
 
         Args:
             args: Optional. Only needed to satisfy pygame-menu requirements.
@@ -723,10 +727,26 @@ class GameContainer(Game):
         super().toggleFullscreen(args)
 
         # Update the value of the menu widget and force render the menu
-        toggle = self.optionsMenu.get_widget("fullscreen")
+        self.updateFullscreenToggle(self.optionsMenu.get_widget("fullscreen"), self.optionsMenu)
 
-        if toggle:
-            toggle.set_value(self.isFullscreen)
+    def updateFullscreenToggle(self, widget, menu) -> None:
+        """
+        This method updates the state of the fullscreen toggle switch depending on the value in the Configuration.
+        It is also registered as a draw callback for the toggle switch
+
+        Tests:
+            - Configuration.isFullscreen spiegelt immer den aktuellen Stand des Fensters wieder
+            - Status des Toggle Switch wird korrekt aktualisiert
+
+        Args:
+            widget (pygame_menu.widgets.core.widget.Widget): The widget that was drawn. In this case the toggle switch
+            menu (pygame_menu.menu.Menu): The menu the widget is in
+
+        Returns: None
+        """
+
+        if widget:
+            widget.set_value(Configuration.isFullscreen)
             self.mainMenu.render()
 
     def updateScoreTable(self, selectValue, *args) -> None:
